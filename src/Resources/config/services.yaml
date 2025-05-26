@@ -1,0 +1,21 @@
+services:
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+  Tourze\TrainCategoryBundle\Controller\:
+    resource: '../../Controller/'
+  Tourze\TrainCategoryBundle\EventSubscriber\:
+    resource: '../../EventSubscriber/'
+  Tourze\TrainCategoryBundle\Functions\:
+    resource: '../../Functions/'
+  Tourze\TrainCategoryBundle\Service\:
+    resource: '../../Service/'
+  Tourze\TrainCategoryBundle\Value\:
+    resource: '../../Value/'
+
+  symfony-ecol.property-accessor:
+    class: Symfony\Component\PropertyAccess\PropertyAccessor
+    factory: [ 'Symfony\Component\PropertyAccess\PropertyAccess', 'createPropertyAccessor' ]
