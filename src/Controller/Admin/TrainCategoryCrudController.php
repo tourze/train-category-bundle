@@ -16,7 +16,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use Tourze\TrainCategoryBundle\Entity\Category;
 
-class CategoryCrudController extends AbstractCrudController
+class TrainCategoryCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
@@ -32,7 +32,7 @@ class CategoryCrudController extends AbstractCrudController
             ->setPageTitle('new', '新建培训分类')
             ->setPageTitle('edit', '编辑培训分类')
             ->setPageTitle('detail', '培训分类详情')
-            ->setHelp('index', '管理培训资源的分类信息，支持树形结构')
+            ->setHelp('index', '管理培训资源的分类信息，支持树形结构。一级是人员类型，二级是行业类别。')
             ->setDefaultSort(['sortNumber' => 'DESC', 'id' => 'DESC'])
             ->setSearchFields(['title']);
     }
@@ -45,28 +45,28 @@ class CategoryCrudController extends AbstractCrudController
 
         yield TextField::new('title', '分类名称')
             ->setRequired(true)
-            ->setMaxLength(100);
+            ->setMaxLength(100)
+            ->setHelp('分类的显示名称，最大100个字符');
 
         yield AssociationField::new('parent', '上级分类')
             ->setRequired(false)
             ->autocomplete()
+            ->setHelp('选择上级分类，留空表示顶级分类')
             ->formatValue(function ($value) {
-                return $value ? (string) $value : '';
+                return $value ? (string) $value : '顶级分类';
             });
 
         yield IntegerField::new('sortNumber', '排序值')
             ->setHelp('数值越大排序越靠前，默认为0')
             ->setRequired(false);
 
-        yield AssociationField::new('banks', '关联题库')
-            ->onlyOnDetail()
-            ->formatValue(function ($value) {
-                if (!$value) {
-                    return '无';
-                }
-                $count = $value->count();
-                return $count > 0 ? "{$count} 个题库" : '无';
-            });
+        yield TextField::new('createdBy', '创建人')
+            ->hideOnForm()
+            ->onlyOnDetail();
+
+        yield TextField::new('updatedBy', '更新人')
+            ->hideOnForm()
+            ->onlyOnDetail();
 
         yield DateTimeField::new('createTime', '创建时间')
             ->hideOnForm()

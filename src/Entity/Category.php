@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use ExamBundle\Entity\Bank;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\AdminArrayInterface;
@@ -45,10 +44,6 @@ class Category implements \Stringable, ApiArrayInterface, AdminArrayInterface
     #[ORM\Column(length: 100, options: ['comment' => '分类名称'])]
     private string $title;
 
-    #[Ignore]
-    #[ORM\OneToMany(targetEntity: Bank::class, mappedBy: 'category')]
-    private Collection $banks;
-
     /**
      * order值大的排序靠前。有效的值范围是[0, 2^32].
      */
@@ -76,7 +71,6 @@ class Category implements \Stringable, ApiArrayInterface, AdminArrayInterface
     public function __construct()
     {
         $this->children = new ArrayCollection();
-        $this->banks = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -148,34 +142,6 @@ class Category implements \Stringable, ApiArrayInterface, AdminArrayInterface
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Bank>
-     */
-    public function getBanks(): Collection
-    {
-        return $this->banks;
-    }
-
-    public function addBank(Bank $bank): static
-    {
-        if (!$this->banks->contains($bank)) {
-            $this->banks->add($bank);
-            $bank->setCategory($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBank(Bank $bank): static
-    {
-        if ($this->banks->removeElement($bank)) {
-            // 注意：Bank 的 category 属性是非空的，所以移除时需要设置为其他分类
-            // 这里可能需要业务逻辑来处理，比如设置为默认分类
-        }
 
         return $this;
     }
