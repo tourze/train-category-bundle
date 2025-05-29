@@ -5,7 +5,7 @@
  Source Server Type    : MySQL
  Source Server Version : 80404 (8.4.4)
  Source Host           : localhost:3306
- Source Schema         : symfony_aio
+ Source Schema         : test
 
  Target Server Type    : MySQL
  Target Server Version : 80404 (8.4.4)
