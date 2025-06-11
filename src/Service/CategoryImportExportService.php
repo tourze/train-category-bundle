@@ -110,7 +110,7 @@ class CategoryImportExportService
                 }
             }
 
-        } catch (\Exception $e) {
+        } catch  (\Throwable $e) {
             $this->entityManager->rollback();
             $result['errors'][] = '导入过程中发生错误：' . $e->getMessage();
             $result['error_count']++;
@@ -223,7 +223,7 @@ class CategoryImportExportService
                 $this->entityManager->rollback();
             }
 
-        } catch (\Exception $e) {
+        } catch  (\Throwable $e) {
             $this->entityManager->rollback();
             $result['errors'][] = '导入过程中发生错误：' . $e->getMessage();
             $result['error_count']++;
@@ -514,7 +514,7 @@ class CategoryImportExportService
                 } else {
                     $result['skipped_count']++;
                 }
-            } catch (\Exception $e) {
+            } catch  (\Throwable $e) {
                 $result['error_count']++;
                 $result['errors'][] = "处理分类 '{$categoryData['title']}' 时发生错误：" . $e->getMessage();
             }
@@ -594,7 +594,7 @@ class CategoryImportExportService
                 $this->categoryService->createCategory($title, $parent, $sortNumber);
                 $result['imported_count']++;
 
-            } catch (\Exception $e) {
+            } catch  (\Throwable $e) {
                 $result['error_count']++;
                 $result['errors'][] = "导入分类时发生错误：" . $e->getMessage();
             }
@@ -638,7 +638,7 @@ class CategoryImportExportService
 
                 $this->requirementService->setCategoryRequirement($category, $requirements);
 
-            } catch (\Exception $e) {
+            } catch  (\Throwable $e) {
                 $result['error_count']++;
                 $result['errors'][] = "导入培训要求时发生错误：" . $e->getMessage();
             }

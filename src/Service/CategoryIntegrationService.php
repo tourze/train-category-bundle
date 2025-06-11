@@ -256,7 +256,7 @@ class CategoryIntegrationService
         try {
             $this->syncToCourseModule($category);
             $results['synced_modules'][] = 'course';
-        } catch (\Exception $e) {
+        } catch  (\Throwable $e) {
             $results['success'] = false;
             $results['failed_modules'][] = 'course';
             $results['errors'][] = '同步到课程模块失败：' . $e->getMessage();
@@ -266,7 +266,7 @@ class CategoryIntegrationService
         try {
             $this->syncToTeacherModule($category);
             $results['synced_modules'][] = 'teacher';
-        } catch (\Exception $e) {
+        } catch  (\Throwable $e) {
             $results['success'] = false;
             $results['failed_modules'][] = 'teacher';
             $results['errors'][] = '同步到教师模块失败：' . $e->getMessage();
@@ -276,7 +276,7 @@ class CategoryIntegrationService
         try {
             $this->syncToCertificateModule($category);
             $results['synced_modules'][] = 'certificate';
-        } catch (\Exception $e) {
+        } catch  (\Throwable $e) {
             $results['success'] = false;
             $results['failed_modules'][] = 'certificate';
             $results['errors'][] = '同步到证书模块失败：' . $e->getMessage();

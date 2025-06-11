@@ -126,7 +126,7 @@ class ImportStandardCategoriesCommand extends Command
                 "跳过分类数量: {$skippedCount}",
             ]);
 
-        } catch (\Exception $e) {
+        } catch  (\Throwable $e) {
             $io->error([
                 '导入过程中发生错误：',
                 $e->getMessage()
