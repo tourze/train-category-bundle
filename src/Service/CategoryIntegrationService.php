@@ -88,15 +88,12 @@ class CategoryIntegrationService
 
     /**
      * 获取分类的考试统计
-     * 
-     * 与exam-bundle集成
      */
     public function getCategoryExamStatistics(Category $category): array
     {
-        // 注意：已移除与ExamBundle的直接关联
         // 如需集成考试功能，请通过其他方式实现
-        
-        $statistics = [
+
+        return [
             'category_id' => $category->getId(),
             'category_title' => $category->getTitle(),
             'total_banks' => 0,
@@ -108,8 +105,6 @@ class CategoryIntegrationService
                 'pass_rate' => 0.0,
             ],
         ];
-
-        return $statistics;
     }
 
     /**
