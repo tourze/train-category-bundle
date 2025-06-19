@@ -18,7 +18,6 @@ class CategorySearchService
     public function __construct(
         private readonly CategoryRepository $categoryRepository,
         private readonly CategoryRequirementRepository $requirementRepository,
-        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -59,12 +58,12 @@ class CategorySearchService
            ->setParameter('keyword', "%{$keyword}%");
 
         // 是否包含子分类搜索
-        if ((bool) $options['includeChildren'] ?? false) {
+        if (($options['includeChildren'] ?? false) === true) {
             $qb->orWhere('EXISTS (SELECT 1 FROM Tourze\TrainCategoryBundle\Entity\Category child WHERE child.parent = c AND child.title LIKE :keyword)');
         }
 
         // 是否搜索培训要求备注
-        if ((bool) $options['includeRequirements'] ?? false) {
+        if (($options['includeRequirements'] ?? false) === true) {
             $qb->leftJoin('Tourze\TrainCategoryBundle\Entity\CategoryRequirement', 'cr', 'WITH', 'cr.category = c')
                ->orWhere('cr.remarks LIKE :keyword');
         }
@@ -240,7 +239,7 @@ class CategorySearchService
         $related = [];
 
         // 同级分类
-        if ($category->getParent()) {
+        if ($category->getParent() !== null) {
             $siblings = $this->categoryRepository->findBy(
                 ['parent' => $category->getParent()],
                 ['sortNumber' => 'DESC'],
@@ -316,7 +315,7 @@ class CategorySearchService
         }
 
         // 父分类筛选
-        if ((bool) isset($criteria['parent'])) {
+        if (array_key_exists('parent', $criteria)) {
             if ($criteria['parent'] === null) {
                 $qb->andWhere('c.parent IS NULL');
             } else {
@@ -482,8 +481,10 @@ class CategorySearchService
         $periods = $this->requirementRepository->getDistinctValidityPeriods();
         $facets = [];
         foreach ($periods as $period) {
-            $count = count($this->requirementRepository->findByValidityPeriod($period));
-            $facets[$period] = $count;
+            if (is_int($period)) {
+                $count = count($this->requirementRepository->findByValidityPeriod($period));
+                $facets[$period] = $count;
+            }
         }
         return $facets;
     }

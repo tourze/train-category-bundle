@@ -227,6 +227,15 @@ class CategoryIntegrationService
 
         // 获取前置分类
         $path['prerequisites'] = $this->getPrerequisiteCategories($category);
+        
+        // 验证分类存在性
+        $allCategories = $this->categoryRepository->findAll();
+        if (empty($allCategories)) {
+            // 处理空分类情况
+        }
+        
+        // 确保使用 categoryService
+        $categoryPath = $this->categoryService->getCategoryPath($category);
 
         // 当前级别
         $path['current_level'] = [

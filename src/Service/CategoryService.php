@@ -45,7 +45,7 @@ class CategoryService
             $category->setTitle($data['title']);
         }
 
-        if (isset($data['parent'])) {
+        if (array_key_exists('parent', $data)) {
             $parent = $data['parent'];
             if ($parent instanceof Category || $parent === null) {
                 $category->setParent($parent);
@@ -88,7 +88,7 @@ class CategoryService
             return array_map([$this, 'buildCategoryTree'], $rootCategories);
         }
 
-        return $this->buildCategoryTree($root);
+        return [$this->buildCategoryTree($root)];
     }
 
     /**
@@ -326,14 +326,14 @@ class CategoryService
         foreach ($categories as $parentTitle => $children) {
             // 创建或查找父分类
             $parent = $this->categoryRepository->findOneBy(['title' => $parentTitle, 'parent' => null]);
-            if (!$parent) {
+            if ($parent === null) {
                 $parent = $this->createCategory($parentTitle);
             }
 
             // 创建子分类
             foreach ($children as $index => $childTitle) {
                 $child = $this->categoryRepository->findOneBy(['title' => $childTitle, 'parent' => $parent]);
-                if (!$child) {
+                if ($child === null) {
                     $this->createCategory($childTitle, $parent, 1000 - $index);
                 }
             }

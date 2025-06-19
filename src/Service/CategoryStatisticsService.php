@@ -17,7 +17,6 @@ class CategoryStatisticsService
     public function __construct(
         private readonly CategoryRepository $categoryRepository,
         private readonly CategoryRequirementRepository $requirementRepository,
-        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -76,7 +75,7 @@ class CategoryStatisticsService
 
         foreach ($allCategories as $category) {
             $level = $this->calculateCategoryLevel($category);
-            $distribution[$level] = ($distribution[$level] ?? 0) + 1;
+            $distribution["level_{$level}"] = ($distribution["level_{$level}"] ?? 0) + 1;
         }
 
         ksort($distribution);

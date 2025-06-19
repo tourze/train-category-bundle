@@ -129,7 +129,7 @@ class CategoryRequirementService
     {
         $requirement = $this->getCategoryRequirement($category);
         
-        if (!$requirement) {
+        if ($requirement === null) {
             return true; // 没有要求则认为满足
         }
 
@@ -150,7 +150,7 @@ class CategoryRequirementService
     {
         $requirement = $this->getCategoryRequirement($category);
         
-        return $requirement ? $requirement->getTotalHours() : 0;
+        return $requirement !== null ? $requirement->getTotalHours() : 0;
     }
 
     /**
@@ -300,7 +300,7 @@ class CategoryRequirementService
     {
         $requirement = $this->getCategoryRequirement($category);
         
-        if (!$requirement) {
+        if ($requirement === null) {
             return ['eligible' => true, 'reasons' => []];
         }
 

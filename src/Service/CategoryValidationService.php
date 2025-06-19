@@ -43,7 +43,7 @@ class CategoryValidationService
 
         // 验证分类路径长度
         $path = $this->categoryService->getCategoryPath($category);
-        $pathString = implode('/', array_map(fn($cat) => $cat instanceof Category ? $cat->getTitle() : '', $path));
+        $pathString = implode('/', array_map(fn($cat) => $cat->getTitle(), $path));
         if (strlen($pathString) > 200) {
             $errors[] = '分类路径过长，建议控制在200字符以内';
         }
@@ -242,7 +242,7 @@ class CategoryValidationService
         $warnings = [];
 
         // 检查分类命名是否符合标准
-        /** @var array<string, mixed> $standardCategories */
+        /** @var array<string, array<int, string>> $standardCategories */
         $standardCategories = $this->categoryService->getStandardizedCategories();
         $isStandardCategory = $this->isStandardCategory($category, $standardCategories);
 

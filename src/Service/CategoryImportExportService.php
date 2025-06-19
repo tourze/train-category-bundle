@@ -358,8 +358,8 @@ class CategoryImportExportService
 
         foreach ($categories as $category) {
             $categoryData = $this->buildCategoryData($category, $includeRequirements);
-            $categoryData['parent_id'] = $category->getParent() ? $category->getParent()->getId() : null;
-            $categoryData['parent_title'] = $category->getParent() ? $category->getParent()->getTitle() : null;
+            $categoryData['parent_id'] = $category->getParent() !== null ? $category->getParent()->getId() : null;
+            $categoryData['parent_title'] = $category->getParent() !== null ? $category->getParent()->getTitle() : null;
             $categoryData['level'] = $this->calculateCategoryLevel($category);
             
             unset($categoryData['children']); // 扁平格式不需要children

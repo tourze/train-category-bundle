@@ -18,10 +18,11 @@ class CategoryRepositoryTest extends TestCase
         $this->assertTrue(class_exists(CategoryRepository::class));
     }
 
-    public function test_categoryRepositoryHasGetDefaultCategoryMethod(): void
+    public function test_categoryRepositoryHasRequiredMethods(): void
     {
-        // 由于 CategoryRepository 有 getDefaultCategory 方法，这个断言总是为真
-        // 可以考虑测试其他更有意义的内容，或者移除这个测试
-        $this->assertNotEmpty(CategoryRepository::class);
+        // 检查 CategoryRepository 类的基本结构
+        $this->assertTrue(class_exists(CategoryRepository::class));
+        $reflection = new \ReflectionClass(CategoryRepository::class);
+        $this->assertTrue($reflection->hasMethod('findAll'));
     }
 } 
