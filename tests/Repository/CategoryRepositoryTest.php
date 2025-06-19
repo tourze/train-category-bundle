@@ -1,6 +1,6 @@
 <?php
 
-namespace Tourze\TrainCategoryBundle\Tests\Unit\Repository;
+namespace Tourze\TrainCategoryBundle\Tests\Repository;
 
 use PHPUnit\Framework\TestCase;
 use Tourze\TrainCategoryBundle\Repository\CategoryRepository;

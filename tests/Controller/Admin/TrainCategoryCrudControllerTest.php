@@ -1,6 +1,6 @@
 <?php
 
-namespace Tourze\TrainCategoryBundle\Tests\Unit\Controller\Admin;
+namespace Tourze\TrainCategoryBundle\Tests\Controller\Admin;
 
 use PHPUnit\Framework\TestCase;
 use Tourze\TrainCategoryBundle\Controller\Admin\TrainCategoryCrudController;

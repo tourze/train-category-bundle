@@ -1,6 +1,6 @@
 <?php
 
-namespace Tourze\TrainCategoryBundle\Tests\Unit\Service;
+namespace Tourze\TrainCategoryBundle\Tests\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
