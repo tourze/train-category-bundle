@@ -24,6 +24,7 @@ class CategoryIntegrationService
      * 获取分类的培训课程信息
      * 
      * 与train-course-bundle集成
+     * @return array<string, mixed>
      */
     public function getCategoryCourses(Category $category): array
     {
@@ -44,6 +45,7 @@ class CategoryIntegrationService
      * 获取分类的教师信息
      * 
      * 与train-teacher-bundle集成
+     * @return array<string, mixed>
      */
     public function getCategoryTeachers(Category $category): array
     {
@@ -63,6 +65,8 @@ class CategoryIntegrationService
      * 获取分类的培训记录统计
      * 
      * 与train-record-bundle集成
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
      */
     public function getCategoryTrainingRecords(Category $category, array $options = []): array
     {
@@ -88,6 +92,7 @@ class CategoryIntegrationService
 
     /**
      * 获取分类的考试统计
+     * @return array<string, mixed>
      */
     public function getCategoryExamStatistics(Category $category): array
     {
@@ -111,6 +116,7 @@ class CategoryIntegrationService
      * 获取分类的证书颁发统计
      * 
      * 与certificate-bundle集成
+     * @return array<string, mixed>
      */
     public function getCategoryCertificateStatistics(Category $category): array
     {
@@ -135,6 +141,8 @@ class CategoryIntegrationService
      * 验证用户是否符合分类的培训资格
      * 
      * 综合验证用户资格
+     * @param array<string, mixed> $userInfo
+     * @return array<string, mixed>
      */
     public function validateUserEligibility(Category $category, array $userInfo): array
     {
@@ -147,7 +155,7 @@ class CategoryIntegrationService
 
         // 基础资格验证
         $basicValidation = $this->validationService->checkCertificateEligibility($category, $userInfo);
-        if (!$basicValidation['eligible']) {
+        if ($basicValidation['eligible'] === false) {
             $result['eligible'] = false;
             $result['reasons'] = array_merge($result['reasons'], $basicValidation['reasons']);
         }
@@ -156,14 +164,14 @@ class CategoryIntegrationService
         // 检查前置培训要求
         if (isset($userInfo['completed_categories'])) {
             $prerequisiteCheck = $this->checkPrerequisiteCategories($category, $userInfo['completed_categories']);
-            if (!$prerequisiteCheck['satisfied']) {
+            if ($prerequisiteCheck['satisfied'] === false) {
                 $result['eligible'] = false;
                 $result['reasons'] = array_merge($result['reasons'], $prerequisiteCheck['missing']);
             }
         }
 
         // 检查教师资质（如果是教师培训）
-        if (isset($userInfo['is_teacher']) && $userInfo['is_teacher']) {
+        if (isset($userInfo['is_teacher']) && $userInfo['is_teacher'] === true) {
             $teacherValidation = $this->validationService->validateTeacherQualification($category, $userInfo);
             if (!empty($teacherValidation)) {
                 $result['eligible'] = false;
@@ -181,6 +189,7 @@ class CategoryIntegrationService
      * 获取分类的完整培训路径
      * 
      * 生成从基础到高级的培训路径
+     * @return array<string, mixed>
      */
     public function getCategoryTrainingPath(Category $category): array
     {
@@ -216,6 +225,7 @@ class CategoryIntegrationService
 
     /**
      * 获取分类的培训资源汇总
+     * @return array<string, mixed>
      */
     public function getCategoryResourceSummary(Category $category): array
     {
@@ -237,6 +247,7 @@ class CategoryIntegrationService
 
     /**
      * 同步分类数据到其他模块
+     * @return array<string, mixed>
      */
     public function syncCategoryToModules(Category $category): array
     {
@@ -282,6 +293,7 @@ class CategoryIntegrationService
 
     /**
      * 获取分类的数据完整性报告
+     * @return array<string, mixed>
      */
     public function getCategoryIntegrityReport(Category $category): array
     {
@@ -302,7 +314,7 @@ class CategoryIntegrationService
         // 检查培训要求
         $requirement = $this->requirementService->getCategoryRequirement($category);
         $report['completeness']['has_requirements'] = $requirement !== null;
-        if (!$requirement) {
+        if ($requirement === null) {
             $report['issues'][] = '缺少培训要求配置';
             $report['recommendations'][] = '建议配置该分类的培训要求';
         }
@@ -340,6 +352,8 @@ class CategoryIntegrationService
 
     /**
      * 检查前置分类要求
+     * @param array<int, int> $completedCategories
+     * @return array<string, mixed>
      */
     private function checkPrerequisiteCategories(Category $category, array $completedCategories): array
     {
@@ -360,6 +374,7 @@ class CategoryIntegrationService
 
     /**
      * 获取前置分类
+     * @return array<int, array<string, mixed>>
      */
     private function getPrerequisiteCategories(Category $category): array
     {
@@ -367,7 +382,7 @@ class CategoryIntegrationService
         // 目前简化为父分类作为前置条件
         $prerequisites = [];
 
-        if ($category->getParent()) {
+        if ($category->getParent() !== null) {
             $prerequisites[] = [
                 'id' => $category->getParent()->getId(),
                 'title' => $category->getParent()->getTitle(),
@@ -380,6 +395,7 @@ class CategoryIntegrationService
 
     /**
      * 获取高级分类
+     * @return array<int, array<string, mixed>>
      */
     private function getAdvancedCategories(Category $category): array
     {
@@ -400,13 +416,14 @@ class CategoryIntegrationService
 
     /**
      * 获取相关分类
+     * @return array<int, array<string, mixed>>
      */
     private function getRelatedCategories(Category $category): array
     {
         // 获取同级分类
         $related = [];
 
-        if ($category->getParent()) {
+        if ($category->getParent() !== null) {
             foreach ($category->getParent()->getChildren() as $sibling) {
                 if ($sibling->getId() !== $category->getId()) {
                     $related[] = [
@@ -423,12 +440,13 @@ class CategoryIntegrationService
 
     /**
      * 计算培训持续时间
+     * @return array<string, mixed>
      */
     private function calculateTrainingDuration(Category $category): array
     {
         $requirement = $this->requirementService->getCategoryRequirement($category);
 
-        if (!$requirement) {
+        if ($requirement === null) {
             return ['days' => 0, 'hours' => 0];
         }
 
@@ -445,6 +463,7 @@ class CategoryIntegrationService
 
     /**
      * 获取相关资源
+     * @return array<string, array<int, mixed>>
      */
     private function getRelatedResources(Category $category): array
     {
@@ -458,12 +477,15 @@ class CategoryIntegrationService
 
     /**
      * 生成资格建议
+     * @param array<string, mixed> $userInfo
+     * @param array<string, mixed> $validationResult
+     * @return array<int, string>
      */
     private function generateEligibilityRecommendations(Category $category, array $userInfo, array $validationResult): array
     {
         $recommendations = [];
 
-        if (!$validationResult['eligible']) {
+        if ($validationResult['eligible'] === false) {
             foreach ($validationResult['reasons'] as $reason) {
                 if (str_contains($reason, '年龄')) {
                     $recommendations[] = '请确认年龄信息是否正确，或选择适合的培训分类';
@@ -480,7 +502,7 @@ class CategoryIntegrationService
             
             // 推荐相关培训
             $relatedCategories = $this->getRelatedCategories($category);
-            if (!empty($relatedCategories)) {
+            if ($relatedCategories !== []) {
                 $recommendations[] = '完成此培训后，您还可以考虑相关的培训分类';
             }
         }

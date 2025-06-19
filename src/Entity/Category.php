@@ -12,11 +12,8 @@ use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\Arrayable\ApiArrayInterface;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
-use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use Tourze\TrainCategoryBundle\Repository\CategoryRepository;
 
 /**
@@ -27,6 +24,7 @@ use Tourze\TrainCategoryBundle\Repository\CategoryRepository;
 class Category implements \Stringable, ApiArrayInterface, AdminArrayInterface
 {
     use TimestampableAware;
+    use BlameableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
@@ -38,6 +36,9 @@ class Category implements \Stringable, ApiArrayInterface, AdminArrayInterface
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Category $parent = null;
 
+    /**
+     * @var Collection<int, Category>
+     */
     #[Groups(['api_tree'])]
     #[ORM\OneToMany(targetEntity: Category::class, mappedBy: 'parent')]
     private Collection $children;
@@ -50,32 +51,21 @@ class Category implements \Stringable, ApiArrayInterface, AdminArrayInterface
      * order值大的排序靠前。有效的值范围是[0, 2^32].
      */
     #[IndexColumn]
-    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => '0', 'comment' => '次序值'])]
     private ?int $sortNumber = 0;
 
-    #[CreatedByColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
-    private ?string $createdBy = null;
 
-    #[UpdatedByColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
-    private ?string $updatedBy = null;
-
-    #[IndexColumn]
-    #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]#[UpdateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]public function __construct()
+    public function __construct()
     {
         $this->children = new ArrayCollection();
     }
 
     public function __toString(): string
     {
-        if (!$this->getId()) {
+        if ($this->getId() === null) {
             return '';
         }
 
-        $parent = $this->getParent() ? strval($this->getParent()) : null;
+        $parent = $this->getParent() !== null ? strval($this->getParent()) : null;
         if (null === $parent) {
             return $this->getTitle();
         }
@@ -102,6 +92,9 @@ class Category implements \Stringable, ApiArrayInterface, AdminArrayInterface
 
     /**
      * @return Collection<Category>
+     */
+    /**
+     * @return Collection<int, Category>
      */
     public function getChildren(): Collection
     {
@@ -154,29 +147,10 @@ class Category implements \Stringable, ApiArrayInterface, AdminArrayInterface
         return $this;
     }
 
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
-    }public function retrieveApiArray(): array
+    /**
+     * @return array<string, mixed>
+     */
+    public function retrieveApiArray(): array
     {
         return [
             'id' => $this->getId(),
@@ -184,6 +158,9 @@ class Category implements \Stringable, ApiArrayInterface, AdminArrayInterface
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function retrieveAdminArray(): array
     {
         return [

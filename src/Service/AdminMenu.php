@@ -22,7 +22,7 @@ class AdminMenu implements MenuProviderInterface
     {
         // 创建主菜单项 培训分类管理
         $categoryMenu = $item->getChild('培训分类管理');
-        if (!$categoryMenu) {
+        if ($categoryMenu === null) {
             $categoryMenu = $item->addChild('培训分类管理')
                 ->setAttribute('icon', 'fa fa-sitemap');
         }

@@ -4,10 +4,8 @@ namespace Tourze\TrainCategoryBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
+use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
-use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\TrainCategoryBundle\Repository\CategoryRequirementRepository;
 
@@ -19,13 +17,13 @@ use Tourze\TrainCategoryBundle\Repository\CategoryRequirementRepository;
 #[ORM\Entity(repositoryClass: CategoryRequirementRepository::class)]
 #[ORM\Table(name: 'train_category_requirement', options: ['comment' => '分类培训要求'])]
 #[ORM\Index(columns: ['category_id'], name: 'idx_category_requirement_category')]
-class CategoryRequirement
+class CategoryRequirement implements Stringable
 {
     use TimestampableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT)]
+#[ORM\Column(type: Types::BIGINT, options: ['comment' => '字段说明'])]
     private string $id;
 
     #[ORM\OneToOne(targetEntity: Category::class)]
@@ -59,25 +57,34 @@ class CategoryRequirement
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => '最高年龄限制', 'default' => 60])]
     private int $maximumAge = 60;
 
+    /**
+     * @var array<int, string>
+     */
     #[ORM\Column(type: Types::JSON, options: ['comment' => '前置条件'])]
     private array $prerequisites = [];
 
+    /**
+     * @var array<int, string>
+     */
     #[ORM\Column(type: Types::JSON, options: ['comment' => '学历要求'])]
     private array $educationRequirements = [];
 
+    /**
+     * @var array<int, string>
+     */
     #[ORM\Column(type: Types::JSON, options: ['comment' => '健康要求'])]
     private array $healthRequirements = [];
 
+    /**
+     * @var array<int, string>
+     */
     #[ORM\Column(type: Types::JSON, options: ['comment' => '工作经验要求'])]
     private array $experienceRequirements = [];
 
     #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '备注说明'])]
     private ?string $remarks = null;
 
-    #[IndexColumn]
-    #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]#[UpdateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -192,44 +199,68 @@ class CategoryRequirement
         return $this;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getPrerequisites(): array
     {
         return $this->prerequisites;
     }
 
+    /**
+     * @param array<int, string> $prerequisites
+     */
     public function setPrerequisites(array $prerequisites): self
     {
         $this->prerequisites = $prerequisites;
         return $this;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getEducationRequirements(): array
     {
         return $this->educationRequirements;
     }
 
+    /**
+     * @param array<int, string> $educationRequirements
+     */
     public function setEducationRequirements(array $educationRequirements): self
     {
         $this->educationRequirements = $educationRequirements;
         return $this;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getHealthRequirements(): array
     {
         return $this->healthRequirements;
     }
 
+    /**
+     * @param array<int, string> $healthRequirements
+     */
     public function setHealthRequirements(array $healthRequirements): self
     {
         $this->healthRequirements = $healthRequirements;
         return $this;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getExperienceRequirements(): array
     {
         return $this->experienceRequirements;
     }
 
+    /**
+     * @param array<int, string> $experienceRequirements
+     */
     public function setExperienceRequirements(array $experienceRequirements): self
     {
         $this->experienceRequirements = $experienceRequirements;
@@ -245,7 +276,9 @@ class CategoryRequirement
     {
         $this->remarks = $remarks;
         return $this;
-    }/**
+    }
+
+    /**
      * 获取总学时（理论+实操）
      */
     public function getTotalHours(): int
@@ -255,6 +288,7 @@ class CategoryRequirement
 
     /**
      * 验证学时配置是否合理
+     * @return array<int, string>
      */
     public function validateHours(): array
     {
@@ -335,5 +369,10 @@ class CategoryRequirement
         $summary[] = "证书有效期{$this->certificateValidityPeriod}个月";
 
         return implode('，', $summary);
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->id;
     }
 } 

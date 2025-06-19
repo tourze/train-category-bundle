@@ -21,12 +21,15 @@ class GetJobTrainingCategory extends BaseProcedure
     ) {
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function execute(): array
     {
         $parent = null;
         if (null !== $this->parentId) {
             $parent = $this->categoryRepository->findOneBy(['id' => $this->parentId]);
-            if (!$parent) {
+            if ($parent === null) {
                 throw new ApiException('找不到上级目录');
             }
         }

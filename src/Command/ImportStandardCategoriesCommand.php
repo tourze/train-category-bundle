@@ -14,12 +14,14 @@ use Tourze\TrainCategoryBundle\Service\CategoryService;
  * 导入AQ8011-2023标准分类命令
  */
 #[AsCommand(
-    name: 'train-category:import-standard',
+    name: self::NAME,
     description: '导入AQ8011-2023标准培训分类'
 )]
 class ImportStandardCategoriesCommand extends Command
 {
-    public function __construct(
+    public const NAME = 'train-category:import-standard';
+    
+public function __construct(
         private readonly CategoryService $categoryService,
     ) {
         parent::__construct();
@@ -48,15 +50,15 @@ class ImportStandardCategoriesCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         
-        $force = $input->getOption('force');
-        $dryRun = $input->getOption('dry-run');
+        $force = (bool) $input->getOption('force');
+        $dryRun = (bool) $input->getOption('dry-run');
 
         $io->title('AQ8011-2023标准培训分类导入工具');
 
         // 获取标准分类数据
         $standardCategories = $this->getAQ8011StandardCategories();
 
-        if ($dryRun) {
+        if ((bool) $dryRun) {
             $io->section('预览模式 - 将要导入的分类：');
             $this->previewCategories($io, $standardCategories);
             return Command::SUCCESS;
@@ -74,11 +76,11 @@ class ImportStandardCategoriesCommand extends Command
                 // 检查父分类是否存在
                 $existingParent = $this->categoryService->findByTitle($parentTitle);
                 
-                if ($existingParent && !$force) {
+                if ($existingParent !== null && !$force) {
                     $io->writeln("  跳过已存在的父分类: {$parentTitle}");
                     $skippedCount++;
                 } else {
-                    if ($existingParent && $force) {
+                    if ($existingParent !== null && $force) {
                         $io->writeln("  强制模式：重新创建父分类: {$parentTitle}");
                     }
                     
@@ -88,32 +90,35 @@ class ImportStandardCategoriesCommand extends Command
                 }
 
                 // 处理子分类
+                if (!is_array($children)) {
+                    continue;
+                }
                 foreach ($children as $index => $childData) {
-                    $childTitle = is_array($childData) ? $childData['title'] : $childData;
+                    $childTitle = is_array($childData) ? (string) $childData['title'] : (string) $childData;
                     $childCode = is_array($childData) ? ($childData['code'] ?? null) : null;
                     $childDescription = is_array($childData) ? ($childData['description'] ?? null) : null;
 
                     $parent = $this->categoryService->findByTitle($parentTitle);
                     $existingChild = $this->categoryService->findByTitleAndParent($childTitle, $parent);
 
-                    if ($existingChild && !$force) {
-                        $io->writeln("    跳过已存在的子分类: {$childTitle}");
+                    if ($existingChild !== null && !$force) {
+                        $io->writeln("    跳过已存在的子分类: " . $childTitle);
                         $skippedCount++;
                     } else {
-                        if ($existingChild && $force) {
-                            $io->writeln("    强制模式：重新创建子分类: {$childTitle}");
+                        if ($existingChild !== null && $force) {
+                            $io->writeln("    强制模式：重新创建子分类: " . $childTitle);
                         }
 
-                        $sortNumber = 1000 - $index;
+                        $sortNumber = 1000 - (int) $index;
                         $child = $this->categoryService->createCategory($childTitle, $parent, $sortNumber);
                         
                         // 如果有编码和描述，可以在这里扩展实体来存储
-                        if ($childCode || $childDescription) {
-                            $io->writeln("    编码: {$childCode}, 描述: {$childDescription}", OutputInterface::VERBOSITY_VERBOSE);
+                        if (!empty($childCode) || !empty($childDescription)) {
+                            $io->writeln("    编码: " . ($childCode ?? '') . ", 描述: " . ($childDescription ?? ''), OutputInterface::VERBOSITY_VERBOSE);
                         }
 
                         $importedCount++;
-                        $io->writeln("    ✓ 创建子分类: {$childTitle}");
+                        $io->writeln("    ✓ 创建子分类: " . $childTitle);
                     }
                 }
 
@@ -139,6 +144,7 @@ class ImportStandardCategoriesCommand extends Command
 
     /**
      * 获取AQ8011-2023标准分类数据
+     * @return array<string, array<int, array<string, string>|string>>
      */
     private function getAQ8011StandardCategories(): array
     {
@@ -259,23 +265,27 @@ class ImportStandardCategoriesCommand extends Command
 
     /**
      * 预览将要导入的分类
+     * @param array<string, array<int, array<string, string>|string>> $categories
      */
     private function previewCategories(SymfonyStyle $io, array $categories): void
     {
         foreach ($categories as $parentTitle => $children) {
             $io->writeln("📁 <info>{$parentTitle}</info>");
             
+            if (!is_array($children)) {
+                continue;
+            }
             foreach ($children as $index => $childData) {
-                $childTitle = is_array($childData) ? $childData['title'] : $childData;
+                $childTitle = is_array($childData) ? (string) $childData['title'] : (string) $childData;
                 $childCode = is_array($childData) ? ($childData['code'] ?? '') : '';
                 $childDescription = is_array($childData) ? ($childData['description'] ?? '') : '';
                 
-                $io->writeln("  ├── {$childTitle}");
-                if ($childCode) {
-                    $io->writeln("      编码: {$childCode}", OutputInterface::VERBOSITY_VERBOSE);
+                $io->writeln("  ├── " . $childTitle);
+                if ((bool) $childCode) {
+                    $io->writeln("      编码: " . $childCode, OutputInterface::VERBOSITY_VERBOSE);
                 }
-                if ($childDescription) {
-                    $io->writeln("      描述: {$childDescription}", OutputInterface::VERBOSITY_VERBOSE);
+                if ((bool) $childDescription) {
+                    $io->writeln("      描述: " . $childDescription, OutputInterface::VERBOSITY_VERBOSE);
                 }
             }
             $io->newLine();

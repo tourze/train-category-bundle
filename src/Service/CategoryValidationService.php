@@ -19,6 +19,7 @@ class CategoryValidationService
 
     /**
      * 验证分类结构的完整性
+     * @return array<int, string>
      */
     public function validateCategoryStructure(Category $category): array
     {
@@ -52,13 +53,15 @@ class CategoryValidationService
 
     /**
      * 验证教师资质是否符合分类要求
+     * @param array<string, mixed> $teacherInfo
+     * @return array<int, string>
      */
     public function validateTeacherQualification(Category $category, array $teacherInfo): array
     {
         $errors = [];
         $requirement = $this->requirementService->getCategoryRequirement($category);
 
-        if (!$requirement) {
+        if ($requirement === null) {
             return $errors; // 没有要求则通过验证
         }
 
@@ -116,13 +119,15 @@ class CategoryValidationService
 
     /**
      * 验证培训要求配置的合理性
+     * @param array<string, mixed> $trainingData
+     * @return array<int, string>
      */
     public function validateTrainingRequirements(Category $category, array $trainingData): array
     {
         $errors = [];
         $requirement = $this->requirementService->getCategoryRequirement($category);
 
-        if (!$requirement) {
+        if ($requirement === null) {
             return $errors; // 没有要求则通过验证
         }
 
@@ -146,14 +151,14 @@ class CategoryValidationService
 
         // 验证实操考试要求
         if ($requirement->isRequiresPracticalExam()) {
-            if (!isset($trainingData['practicalExam']) || !$trainingData['practicalExam']) {
+            if (!isset($trainingData['practicalExam']) || $trainingData['practicalExam'] === false) {
                 $errors[] = '该分类要求进行实操考试';
             }
         }
 
         // 验证现场培训要求
         if ($requirement->isRequiresOnSiteTraining()) {
-            if (!isset($trainingData['onSiteTraining']) || !$trainingData['onSiteTraining']) {
+            if (!isset($trainingData['onSiteTraining']) || $trainingData['onSiteTraining'] === false) {
                 $errors[] = '该分类要求进行现场培训';
             }
         }
@@ -163,6 +168,8 @@ class CategoryValidationService
 
     /**
      * 检查证书申请资格
+     * @param array<string, mixed> $userInfo
+     * @return array<string, mixed>
      */
     public function checkCertificateEligibility(Category $category, array $userInfo): array
     {
@@ -174,7 +181,7 @@ class CategoryValidationService
 
         $requirement = $this->requirementService->getCategoryRequirement($category);
 
-        if (!$requirement) {
+        if ($requirement === null) {
             return $result;
         }
 
@@ -196,7 +203,7 @@ class CategoryValidationService
 
         // 检查考试成绩
         if ($requirement->isRequiresPracticalExam()) {
-            if (!isset($userInfo['practicalExamPassed']) || !$userInfo['practicalExamPassed']) {
+            if (!isset($userInfo['practicalExamPassed']) || $userInfo['practicalExamPassed'] === false) {
                 $result['eligible'] = false;
                 $result['reasons'][] = '需要通过实操考试';
             }
@@ -217,6 +224,7 @@ class CategoryValidationService
 
     /**
      * 验证分类的AQ8011-2023标准符合性
+     * @return array<string, mixed>
      */
     public function validateStandardCompliance(Category $category): array
     {
@@ -233,7 +241,7 @@ class CategoryValidationService
 
         // 检查是否有对应的培训要求
         $requirement = $this->requirementService->getCategoryRequirement($category);
-        if (!$requirement) {
+        if ($requirement === null) {
             $errors[] = '缺少培训要求配置，不符合AQ8011-2023标准';
         } else {
             // 验证要求配置的合理性
@@ -267,6 +275,8 @@ class CategoryValidationService
 
     /**
      * 批量验证分类结构
+     * @param array<int, Category> $categories
+     * @return array<int, array<string, mixed>>
      */
     public function batchValidateCategories(array $categories): array
     {
@@ -305,6 +315,7 @@ class CategoryValidationService
 
     /**
      * 验证学历要求
+     * @param array<int, string> $requirements
      */
     private function validateEducationRequirement(string $userEducation, array $requirements): bool
     {
@@ -334,6 +345,8 @@ class CategoryValidationService
 
     /**
      * 验证工作经验要求
+     * @param array<string, mixed> $userExperience
+     * @param array<string, mixed> $requirements
      */
     private function validateExperienceRequirement(array $userExperience, array $requirements): bool
     {
@@ -344,6 +357,8 @@ class CategoryValidationService
 
     /**
      * 验证健康要求
+     * @param array<string, mixed> $userHealth
+     * @param array<string, mixed> $requirements
      */
     private function validateHealthRequirement(array $userHealth, array $requirements): bool
     {
@@ -354,6 +369,7 @@ class CategoryValidationService
 
     /**
      * 检查是否为标准分类
+     * @param array<string, mixed> $standardCategories
      */
     private function isStandardCategory(Category $category, array $standardCategories): bool
     {
@@ -393,6 +409,6 @@ class CategoryValidationService
         ];
 
         return in_array($category->getTitle(), $specialOperations) ||
-               ($category->getParent() && $category->getParent()->getTitle() === '特种作业类别');
+               ($category->getParent() !== null && $category->getParent()->getTitle() === '特种作业类别');
     }
 }

@@ -164,7 +164,7 @@ class CategoryTest extends TestCase
 
     public function test_setCreateTime_withValidDateTime(): void
     {
-        $dateTime = new \DateTime();
+        $dateTime = new \DateTimeImmutable();
         $this->category->setCreateTime($dateTime);
         
         $this->assertSame($dateTime, $this->category->getCreateTime());
@@ -172,7 +172,7 @@ class CategoryTest extends TestCase
 
     public function test_setUpdateTime_withValidDateTime(): void
     {
-        $dateTime = new \DateTime();
+        $dateTime = new \DateTimeImmutable();
         $this->category->setUpdateTime($dateTime);
         
         $this->assertSame($dateTime, $this->category->getUpdateTime());

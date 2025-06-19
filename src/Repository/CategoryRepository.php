@@ -7,10 +7,11 @@ use Doctrine\Persistence\ManagerRegistry;
 use Tourze\TrainCategoryBundle\Entity\Category;
 
 /**
+ * @extends ServiceEntityRepository<Category>
  * @method Category|null find($id, $lockMode = null, $lockVersion = null)
- * @method Category|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Category|null findOneBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null)
  * @method Category[]    findAll()
- * @method Category[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Category[]    findBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null, $limit = null, $offset = null)
  */
 class CategoryRepository extends ServiceEntityRepository
 {
@@ -24,7 +25,7 @@ class CategoryRepository extends ServiceEntityRepository
     {
         $title = '未分类';
         $category = $this->findOneBy(['title' => $title]);
-        if (!$category) {
+        if ($category === null) {
             $category = new Category();
             $category->setTitle($title);
             $this->getEntityManager()->persist($category);

@@ -461,7 +461,7 @@ class CategoryStatisticsService
            ->andWhere('children.id IS NULL');
         $orphanCategories = $qb->getQuery()->getResult();
 
-        if (count($orphanCategories) > 0) {
+        if ((bool) count($orphanCategories) > 0) {
             $issues[] = [
                 'type' => 'structure',
                 'severity' => 'medium',
@@ -606,20 +606,20 @@ class CategoryStatisticsService
         foreach ($issues as $issue) {
             switch ($issue['type']) {
                 case 'structure':
-                    if (str_contains($issue['message'], '孤立分类')) {
+                    if ((bool) str_contains($issue['message'], '孤立分类')) {
                         $recommendations[] = '建议为孤立分类添加父分类或子分类，或考虑删除不必要的分类';
                     }
-                    if (str_contains($issue['message'], '层级过深')) {
+                    if ((bool) str_contains($issue['message'], '层级过深')) {
                         $recommendations[] = '建议重新设计分类结构，将深层级分类提升或合并';
                     }
                     break;
                 case 'completeness':
-                    if (str_contains($issue['message'], '缺少培训要求')) {
+                    if ((bool) str_contains($issue['message'], '缺少培训要求')) {
                         $recommendations[] = '建议为所有分类配置相应的培训要求，确保符合AQ8011-2023标准';
                     }
                     break;
                 case 'usage':
-                    if (str_contains($issue['message'], '未被使用')) {
+                    if ((bool) str_contains($issue['message'], '未被使用')) {
                         $recommendations[] = '建议清理未使用的分类，或为其添加相关内容（子分类或题库）';
                     }
                     break;
@@ -639,7 +639,7 @@ class CategoryStatisticsService
         $csv = [];
         $csv[] = ['指标', '数值'];
         
-        if (isset($data['overview'])) {
+        if ((bool) isset($data['overview'])) {
             foreach ($data['overview'] as $key => $value) {
                 if (!is_array($value)) {
                     $csv[] = [$key, $value];

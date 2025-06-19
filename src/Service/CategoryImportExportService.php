@@ -23,16 +23,18 @@ class CategoryImportExportService
 
     /**
      * 导出分类数据
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
      */
     public function exportCategories(array $options = []): array
     {
-        $format = $options['format'] ?? 'json';
-        $includeRequirements = $options['includeRequirements'] ?? true;
-        $includeHierarchy = $options['includeHierarchy'] ?? true;
+        $format = (string) ($options['format'] ?? 'json');
+        $includeRequirements = (bool) ($options['includeRequirements'] ?? true);
+        $includeHierarchy = (bool) ($options['includeHierarchy'] ?? true);
         $categoryIds = $options['categoryIds'] ?? null;
 
         // 获取要导出的分类
-        if ($categoryIds) {
+        if ($categoryIds !== null) {
             $categories = $this->categoryRepository->findBy(['id' => $categoryIds]);
         } else {
             $categories = $this->categoryRepository->findAll();
@@ -62,12 +64,15 @@ class CategoryImportExportService
 
     /**
      * 导入分类数据
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
      */
     public function importCategories(array $data, array $options = []): array
     {
-        $dryRun = $options['dryRun'] ?? false;
-        $overwrite = $options['overwrite'] ?? false;
-        $validateOnly = $options['validateOnly'] ?? false;
+        $dryRun = (bool) ($options['dryRun'] ?? false);
+        $overwrite = (bool) ($options['overwrite'] ?? false);
+        $validateOnly = (bool) ($options['validateOnly'] ?? false);
 
         $result = [
             'success' => false,
@@ -81,7 +86,7 @@ class CategoryImportExportService
         try {
             // 验证导入数据格式
             $validationResult = $this->validateImportData($data);
-            if (!$validationResult['valid']) {
+            if ($validationResult['valid'] === false) {
                 $result['errors'] = $validationResult['errors'];
                 return $result;
             }
@@ -100,7 +105,7 @@ class CategoryImportExportService
                 $result = array_merge($result, $importResult);
             }
 
-            if (!$dryRun && $result['error_count'] === 0) {
+            if ($dryRun === false && $result['error_count'] === 0) {
                 $this->entityManager->commit();
                 $result['success'] = true;
             } else {
@@ -121,11 +126,13 @@ class CategoryImportExportService
 
     /**
      * 导出为Excel格式
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
      */
     public function exportToExcel(array $options = []): array
     {
         $categories = $this->categoryRepository->findAll();
-        $includeRequirements = $options['includeRequirements'] ?? true;
+        $includeRequirements = (bool) ($options['includeRequirements'] ?? true);
 
         $excelData = [
             'sheets' => [
@@ -153,8 +160,8 @@ class CategoryImportExportService
             $excelData['sheets']['categories']['data'][] = [
                 $category->getId(),
                 $category->getTitle(),
-                $category->getParent() ? $category->getParent()->getId() : '',
-                $category->getParent() ? $category->getParent()->getTitle() : '',
+                $category->getParent() !== null ? $category->getParent()->getId() : '',
+                $category->getParent() !== null ? $category->getParent()->getTitle() : '',
                 $category->getSortNumber(),
                 $level,
                 $category->getCreateTime()->format('Y-m-d H:i:s'),
@@ -163,7 +170,7 @@ class CategoryImportExportService
             // 培训要求数据
             if ($includeRequirements) {
                 $requirement = $this->requirementService->getCategoryRequirement($category);
-                if ($requirement) {
+                if ($requirement !== null) {
                     $excelData['sheets']['requirements']['data'][] = [
                         $requirement->getId(),
                         $category->getId(),
@@ -188,6 +195,9 @@ class CategoryImportExportService
 
     /**
      * 从Excel导入
+     * @param array<string, mixed> $excelData
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
      */
     public function importFromExcel(array $excelData, array $options = []): array
     {
@@ -234,6 +244,7 @@ class CategoryImportExportService
 
     /**
      * 导出分类模板
+     * @return array<string, mixed>
      */
     public function exportTemplate(string $format = 'excel'): array
     {
@@ -273,11 +284,13 @@ class CategoryImportExportService
 
     /**
      * 批量导出指定分类及其子分类
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
      */
     public function exportCategoryBranch(Category $rootCategory, array $options = []): array
     {
-        $includeRequirements = $options['includeRequirements'] ?? true;
-        $format = $options['format'] ?? 'json';
+        $includeRequirements = (bool) ($options['includeRequirements'] ?? true);
+        $format = (string) ($options['format'] ?? 'json');
 
         // 获取分类树
         $categoryTree = $this->buildCategoryBranch($rootCategory, $includeRequirements);
@@ -297,6 +310,8 @@ class CategoryImportExportService
 
     /**
      * 构建层级导出数据
+     * @param array<int, Category> $categories
+     * @return array<int, array<string, mixed>>
      */
     private function buildHierarchicalExport(array $categories, bool $includeRequirements): array
     {
@@ -328,6 +343,8 @@ class CategoryImportExportService
 
     /**
      * 构建扁平导出数据
+     * @param array<int, Category> $categories
+     * @return array<int, array<string, mixed>>
      */
     private function buildFlatExport(array $categories, bool $includeRequirements): array
     {
@@ -348,6 +365,7 @@ class CategoryImportExportService
 
     /**
      * 构建单个分类数据
+     * @return array<string, mixed>
      */
     private function buildCategoryData(Category $category, bool $includeRequirements): array
     {
@@ -362,7 +380,7 @@ class CategoryImportExportService
 
         if ($includeRequirements) {
             $requirement = $this->requirementService->getCategoryRequirement($category);
-            if ($requirement) {
+            if ($requirement !== null) {
                 $data['requirement'] = [
                     'initial_training_hours' => $requirement->getInitialTrainingHours(),
                     'refresh_training_hours' => $requirement->getRefreshTrainingHours(),
@@ -387,6 +405,7 @@ class CategoryImportExportService
 
     /**
      * 构建分类分支
+     * @return array<string, mixed>
      */
     private function buildCategoryBranch(Category $category, bool $includeRequirements): array
     {
@@ -401,6 +420,8 @@ class CategoryImportExportService
 
     /**
      * 格式化导出数据
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
      */
     private function formatExportData(array $data, string $format): array
     {
@@ -435,6 +456,8 @@ class CategoryImportExportService
 
     /**
      * 验证导入数据
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
      */
     private function validateImportData(array $data): array
     {
@@ -468,6 +491,8 @@ class CategoryImportExportService
 
     /**
      * 验证培训要求数据
+     * @param array<string, mixed> $requirementData
+     * @return array<int, string>
      */
     private function validateRequirementData(array $requirementData): array
     {
@@ -496,6 +521,8 @@ class CategoryImportExportService
 
     /**
      * 处理导入数据
+     * @param array<int, array<string, mixed>> $categoriesData
+     * @return array<string, mixed>
      */
     private function processImportData(array $categoriesData, bool $dryRun, bool $overwrite): array
     {
@@ -525,13 +552,15 @@ class CategoryImportExportService
 
     /**
      * 处理单个分类
+     * @param array<string, mixed> $categoryData
+     * @return array<string, bool|string>
      */
     private function processCategory(array $categoryData, bool $dryRun, bool $overwrite): array
     {
         $title = $categoryData['title'];
         $existingCategory = $this->categoryService->findByTitle($title);
 
-        if ($existingCategory && !$overwrite) {
+        if ($existingCategory !== null && !$overwrite) {
             return ['success' => false, 'message' => '分类已存在'];
         }
 
@@ -543,7 +572,7 @@ class CategoryImportExportService
             }
 
             // 创建或更新分类
-            if ($existingCategory && $overwrite) {
+            if ($existingCategory !== null && $overwrite) {
                 $category = $this->categoryService->updateCategory($existingCategory, [
                     'title' => $title,
                     'parent' => $parent,
@@ -568,6 +597,8 @@ class CategoryImportExportService
 
     /**
      * 从Excel导入分类
+     * @param array<int, array<int, mixed>> $categoriesData
+     * @return array<string, mixed>
      */
     private function importCategoriesFromExcel(array $categoriesData): array
     {
@@ -582,9 +613,9 @@ class CategoryImportExportService
                 $sortNumber = (int) ($row[2] ?? 0);
 
                 $parent = null;
-                if ($parentTitle) {
+                if ($parentTitle !== null) {
                     $parent = $this->categoryService->findByTitle($parentTitle);
-                    if (!$parent) {
+                    if ($parent === null) {
                         $result['errors'][] = "分类 '{$title}' 的父分类 '{$parentTitle}' 不存在";
                         $result['error_count']++;
                         continue;
@@ -605,6 +636,8 @@ class CategoryImportExportService
 
     /**
      * 从Excel导入培训要求
+     * @param array<int, array<int, mixed>> $requirementsData
+     * @return array<string, mixed>
      */
     private function importRequirementsFromExcel(array $requirementsData): array
     {
@@ -617,7 +650,7 @@ class CategoryImportExportService
                 $categoryTitle = $row[0];
                 $category = $this->categoryService->findByTitle($categoryTitle);
 
-                if (!$category) {
+                if ($category === null) {
                     $result['errors'][] = "分类 '{$categoryTitle}' 不存在";
                     $result['error_count']++;
                     continue;
@@ -663,6 +696,7 @@ class CategoryImportExportService
 
     /**
      * 数组转XML
+     * @param array<string, mixed> $data
      */
     private function arrayToXml(array $data): string
     {
@@ -673,6 +707,7 @@ class CategoryImportExportService
 
     /**
      * 递归转换数组到XML
+     * @param array<string, mixed> $data
      */
     private function arrayToXmlRecursive(array $data, \SimpleXMLElement $xml): void
     {
@@ -688,6 +723,7 @@ class CategoryImportExportService
 
     /**
      * 数组转CSV
+     * @param array<int, array<string, mixed>> $data
      */
     private function arrayToCsv(array $data): string
     {

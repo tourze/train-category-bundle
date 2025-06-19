@@ -40,15 +40,15 @@ class CategoryService
      */
     public function updateCategory(Category $category, array $data): Category
     {
-        if (isset($data['title'])) {
+        if ((bool) isset($data['title'])) {
             $category->setTitle($data['title']);
         }
 
-        if (isset($data['parent'])) {
+        if ((bool) isset($data['parent'])) {
             $category->setParent($data['parent']);
         }
 
-        if (isset($data['sortNumber'])) {
+        if ((bool) isset($data['sortNumber'])) {
             $category->setSortNumber($data['sortNumber']);
         }
 

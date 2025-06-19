@@ -33,63 +33,63 @@ class CategoryRequirementService
         }
 
         // 设置学时要求
-        if (isset($requirements['initialTrainingHours'])) {
+        if ((bool) isset($requirements['initialTrainingHours'])) {
             $requirement->setInitialTrainingHours($requirements['initialTrainingHours']);
         }
 
-        if (isset($requirements['refreshTrainingHours'])) {
+        if ((bool) isset($requirements['refreshTrainingHours'])) {
             $requirement->setRefreshTrainingHours($requirements['refreshTrainingHours']);
         }
 
-        if (isset($requirements['theoryHours'])) {
+        if ((bool) isset($requirements['theoryHours'])) {
             $requirement->setTheoryHours($requirements['theoryHours']);
         }
 
-        if (isset($requirements['practiceHours'])) {
+        if ((bool) isset($requirements['practiceHours'])) {
             $requirement->setPracticeHours($requirements['practiceHours']);
         }
 
         // 设置证书要求
-        if (isset($requirements['certificateValidityPeriod'])) {
+        if ((bool) isset($requirements['certificateValidityPeriod'])) {
             $requirement->setCertificateValidityPeriod($requirements['certificateValidityPeriod']);
         }
 
         // 设置考试和培训要求
-        if (isset($requirements['requiresPracticalExam'])) {
+        if ((bool) isset($requirements['requiresPracticalExam'])) {
             $requirement->setRequiresPracticalExam($requirements['requiresPracticalExam']);
         }
 
-        if (isset($requirements['requiresOnSiteTraining'])) {
+        if ((bool) isset($requirements['requiresOnSiteTraining'])) {
             $requirement->setRequiresOnSiteTraining($requirements['requiresOnSiteTraining']);
         }
 
         // 设置年龄要求
-        if (isset($requirements['minimumAge'])) {
+        if ((bool) isset($requirements['minimumAge'])) {
             $requirement->setMinimumAge($requirements['minimumAge']);
         }
 
-        if (isset($requirements['maximumAge'])) {
+        if ((bool) isset($requirements['maximumAge'])) {
             $requirement->setMaximumAge($requirements['maximumAge']);
         }
 
         // 设置其他要求
-        if (isset($requirements['prerequisites'])) {
+        if ((bool) isset($requirements['prerequisites'])) {
             $requirement->setPrerequisites($requirements['prerequisites']);
         }
 
-        if (isset($requirements['educationRequirements'])) {
+        if ((bool) isset($requirements['educationRequirements'])) {
             $requirement->setEducationRequirements($requirements['educationRequirements']);
         }
 
-        if (isset($requirements['healthRequirements'])) {
+        if ((bool) isset($requirements['healthRequirements'])) {
             $requirement->setHealthRequirements($requirements['healthRequirements']);
         }
 
-        if (isset($requirements['experienceRequirements'])) {
+        if ((bool) isset($requirements['experienceRequirements'])) {
             $requirement->setExperienceRequirements($requirements['experienceRequirements']);
         }
 
-        if (isset($requirements['remarks'])) {
+        if ((bool) isset($requirements['remarks'])) {
             $requirement->setRemarks($requirements['remarks']);
         }
 
@@ -298,7 +298,7 @@ class CategoryRequirementService
         $reasons = [];
 
         // 检查年龄要求
-        if (isset($userInfo['age'])) {
+        if ((bool) isset($userInfo['age'])) {
             if (!$requirement->checkAgeRequirement($userInfo['age'])) {
                 $reasons[] = "年龄不符合要求（要求：{$requirement->getMinimumAge()}-{$requirement->getMaximumAge()}岁）";
             }
@@ -344,7 +344,7 @@ class CategoryRequirementService
     {
         $requirement = $this->getCategoryRequirement($category);
         
-        if ($requirement) {
+        if ((bool) $requirement) {
             $this->entityManager->remove($requirement);
             $this->entityManager->flush();
         }

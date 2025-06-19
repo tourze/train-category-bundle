@@ -93,7 +93,7 @@ class CategoryRequirementCrudController extends AbstractCrudController
             ->setRequired(false);
 
         // 详细要求（仅在详情和编辑页面显示）
-        if (in_array($pageName, [Crud::PAGE_DETAIL, Crud::PAGE_EDIT, Crud::PAGE_NEW])) {
+        if ((bool) in_array($pageName, [Crud::PAGE_DETAIL, Crud::PAGE_EDIT, Crud::PAGE_NEW])) {
             yield TextareaField::new('prerequisites', '前置条件')
                 ->setHelp('JSON格式的前置条件数组，如：["身体健康","无色盲色弱"]')
                 ->hideOnIndex()

@@ -176,7 +176,7 @@ class CategoryRequirementTest extends TestCase
 
     public function testTimeFields(): void
     {
-        $now = new \DateTime();
+        $now = new \DateTimeImmutable();
         
         $this->requirement->setCreateTime($now);
         $this->assertEquals($now, $this->requirement->getCreateTime());

@@ -53,18 +53,18 @@ class CategorySearchService
            ->setParameter('keyword', "%{$keyword}%");
 
         // 是否包含子分类搜索
-        if ($options['includeChildren'] ?? false) {
+        if ((bool) $options['includeChildren'] ?? false) {
             $qb->orWhere('EXISTS (SELECT 1 FROM Tourze\TrainCategoryBundle\Entity\Category child WHERE child.parent = c AND child.title LIKE :keyword)');
         }
 
         // 是否搜索培训要求备注
-        if ($options['includeRequirements'] ?? false) {
+        if ((bool) $options['includeRequirements'] ?? false) {
             $qb->leftJoin('Tourze\TrainCategoryBundle\Entity\CategoryRequirement', 'cr', 'WITH', 'cr.category = c')
                ->orWhere('cr.remarks LIKE :keyword');
         }
 
         // 限制结果数量
-        if (isset($options['limit'])) {
+        if ((bool) isset($options['limit'])) {
             $qb->setMaxResults($options['limit']);
         }
 
@@ -102,42 +102,42 @@ class CategorySearchService
         $qb->innerJoin('Tourze\TrainCategoryBundle\Entity\CategoryRequirement', 'cr', 'WITH', 'cr.category = c');
 
         // 学时要求
-        if (isset($requirements['minInitialHours'])) {
+        if ((bool) isset($requirements['minInitialHours'])) {
             $qb->andWhere('cr.initialTrainingHours >= :minInitialHours')
                ->setParameter('minInitialHours', $requirements['minInitialHours']);
         }
 
-        if (isset($requirements['maxInitialHours'])) {
+        if ((bool) isset($requirements['maxInitialHours'])) {
             $qb->andWhere('cr.initialTrainingHours <= :maxInitialHours')
                ->setParameter('maxInitialHours', $requirements['maxInitialHours']);
         }
 
         // 证书有效期
-        if (isset($requirements['validityPeriod'])) {
+        if ((bool) isset($requirements['validityPeriod'])) {
             $qb->andWhere('cr.certificateValidityPeriod = :validityPeriod')
                ->setParameter('validityPeriod', $requirements['validityPeriod']);
         }
 
         // 实操考试要求
-        if (isset($requirements['requiresPracticalExam'])) {
+        if ((bool) isset($requirements['requiresPracticalExam'])) {
             $qb->andWhere('cr.requiresPracticalExam = :requiresPracticalExam')
                ->setParameter('requiresPracticalExam', $requirements['requiresPracticalExam']);
         }
 
         // 现场培训要求
-        if (isset($requirements['requiresOnSiteTraining'])) {
+        if ((bool) isset($requirements['requiresOnSiteTraining'])) {
             $qb->andWhere('cr.requiresOnSiteTraining = :requiresOnSiteTraining')
                ->setParameter('requiresOnSiteTraining', $requirements['requiresOnSiteTraining']);
         }
 
         // 年龄范围
-        if (isset($requirements['ageRange'])) {
+        if ((bool) isset($requirements['ageRange'])) {
             $ageRange = $requirements['ageRange'];
-            if (isset($ageRange['min'])) {
+            if ((bool) isset($ageRange['min'])) {
                 $qb->andWhere('cr.minimumAge <= :userAge')
                    ->setParameter('userAge', $ageRange['min']);
             }
-            if (isset($ageRange['max'])) {
+            if ((bool) isset($ageRange['max'])) {
                 $qb->andWhere('cr.maximumAge >= :userAge')
                    ->setParameter('userAge', $ageRange['max']);
             }
@@ -157,7 +157,7 @@ class CategorySearchService
         $recommendations = [];
 
         // 基于用户年龄推荐
-        if (isset($userProfile['age'])) {
+        if ((bool) isset($userProfile['age'])) {
             $ageBasedCategories = $this->searchByRequirements([
                 'ageRange' => ['min' => $userProfile['age'], 'max' => $userProfile['age']]
             ]);
@@ -165,13 +165,13 @@ class CategorySearchService
         }
 
         // 基于用户行业推荐
-        if (isset($userProfile['industry'])) {
+        if ((bool) isset($userProfile['industry'])) {
             $industryCategories = $this->searchByKeyword($userProfile['industry'], ['includeChildren' => true]);
             $recommendations['industry_based'] = $industryCategories;
         }
 
         // 基于用户经验推荐
-        if (isset($userProfile['experience'])) {
+        if ((bool) isset($userProfile['experience'])) {
             $experienceLevel = $userProfile['experience'];
             if ($experienceLevel < 2) {
                 // 新手推荐基础培训
@@ -238,7 +238,7 @@ class CategorySearchService
 
         // 相似要求的分类
         $requirement = $this->requirementRepository->findByCategory($category);
-        if ($requirement) {
+        if ((bool) $requirement) {
             $similarCategories = $this->searchByRequirements([
                 'validityPeriod' => $requirement->getCertificateValidityPeriod(),
                 'requiresPracticalExam' => $requirement->isRequiresPracticalExam(),
@@ -292,7 +292,7 @@ class CategorySearchService
         }
 
         // 父分类筛选
-        if (isset($criteria['parent'])) {
+        if ((bool) isset($criteria['parent'])) {
             if ($criteria['parent'] === null) {
                 $qb->andWhere('c.parent IS NULL');
             } else {
@@ -302,31 +302,31 @@ class CategorySearchService
         }
 
         // 层级筛选
-        if (isset($criteria['level'])) {
+        if ((bool) isset($criteria['level'])) {
             $this->buildLevelQuery($qb, $criteria['level']);
         }
 
         // 排序值范围
-        if (isset($criteria['sortRange'])) {
+        if ((bool) isset($criteria['sortRange'])) {
             $range = $criteria['sortRange'];
-            if (isset($range['min'])) {
+            if ((bool) isset($range['min'])) {
                 $qb->andWhere('c.sortNumber >= :minSort')
                    ->setParameter('minSort', $range['min']);
             }
-            if (isset($range['max'])) {
+            if ((bool) isset($range['max'])) {
                 $qb->andWhere('c.sortNumber <= :maxSort')
                    ->setParameter('maxSort', $range['max']);
             }
         }
 
         // 创建时间范围
-        if (isset($criteria['dateRange'])) {
+        if ((bool) isset($criteria['dateRange'])) {
             $range = $criteria['dateRange'];
-            if (isset($range['start'])) {
+            if ((bool) isset($range['start'])) {
                 $qb->andWhere('c.createTime >= :startDate')
                    ->setParameter('startDate', $range['start']);
             }
-            if (isset($range['end'])) {
+            if ((bool) isset($range['end'])) {
                 $qb->andWhere('c.createTime <= :endDate')
                    ->setParameter('endDate', $range['end']);
             }
@@ -343,30 +343,30 @@ class CategorySearchService
      */
     private function applyRequirementCriteria(QueryBuilder $qb, array $requirements): void
     {
-        if (isset($requirements['hasRequirements'])) {
-            if ($requirements['hasRequirements']) {
+        if ((bool) isset($requirements['hasRequirements'])) {
+            if ((bool) $requirements['hasRequirements']) {
                 $qb->andWhere('cr.id IS NOT NULL');
             } else {
                 $qb->andWhere('cr.id IS NULL');
             }
         }
 
-        if (isset($requirements['minHours'])) {
+        if ((bool) isset($requirements['minHours'])) {
             $qb->andWhere('cr.initialTrainingHours >= :minHours')
                ->setParameter('minHours', $requirements['minHours']);
         }
 
-        if (isset($requirements['maxHours'])) {
+        if ((bool) isset($requirements['maxHours'])) {
             $qb->andWhere('cr.initialTrainingHours <= :maxHours')
                ->setParameter('maxHours', $requirements['maxHours']);
         }
 
-        if (isset($requirements['practicalExam'])) {
+        if ((bool) isset($requirements['practicalExam'])) {
             $qb->andWhere('cr.requiresPracticalExam = :practicalExam')
                ->setParameter('practicalExam', $requirements['practicalExam']);
         }
 
-        if (isset($requirements['onSiteTraining'])) {
+        if ((bool) isset($requirements['onSiteTraining'])) {
             $qb->andWhere('cr.requiresOnSiteTraining = :onSiteTraining')
                ->setParameter('onSiteTraining', $requirements['onSiteTraining']);
         }
@@ -405,7 +405,7 @@ class CategorySearchService
         foreach ($filters as $field => $value) {
             switch ($field) {
                 case 'hasChildren':
-                    if ($value) {
+                    if ((bool) $value) {
                         $qb->andWhere('EXISTS (SELECT 1 FROM Tourze\TrainCategoryBundle\Entity\Category child WHERE child.parent = c)');
                     } else {
                         $qb->andWhere('NOT EXISTS (SELECT 1 FROM Tourze\TrainCategoryBundle\Entity\Category child WHERE child.parent = c)');
