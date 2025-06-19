@@ -25,6 +25,9 @@ class CategorySearchService
     /**
      * 高级搜索分类
      */
+    /**
+     * @return array<string, mixed>
+     */
     public function advancedSearch(array $criteria): array
     {
         $qb = $this->categoryRepository->createQueryBuilder('c');
@@ -43,6 +46,9 @@ class CategorySearchService
 
     /**
      * 按关键词搜索
+     */
+    /**
+     * @return array<string, mixed>
      */
     public function searchByKeyword(string $keyword, array $options = []): array
     {
@@ -77,6 +83,9 @@ class CategorySearchService
     /**
      * 按层级搜索
      */
+    /**
+     * @return array<string, mixed>
+     */
     public function searchByLevel(int $level, array $filters = []): array
     {
         $qb = $this->categoryRepository->createQueryBuilder('c');
@@ -95,6 +104,9 @@ class CategorySearchService
 
     /**
      * 按培训要求搜索
+     */
+    /**
+     * @return array<string, mixed>
      */
     public function searchByRequirements(array $requirements): array
     {
@@ -152,6 +164,9 @@ class CategorySearchService
     /**
      * 智能推荐分类
      */
+    /**
+     * @return array<string, mixed>
+     */
     public function recommendCategories(array $userProfile): array
     {
         $recommendations = [];
@@ -196,6 +211,9 @@ class CategorySearchService
     /**
      * 获取热门分类
      */
+    /**
+     * @return array<string, mixed>
+     */
     public function getPopularCategories(int $limit = 10): array
     {
         $qb = $this->categoryRepository->createQueryBuilder('c');
@@ -213,6 +231,9 @@ class CategorySearchService
 
     /**
      * 获取相关分类
+     */
+    /**
+     * @return array<string, mixed>
      */
     public function getRelatedCategories(Category $category, int $limit = 5): array
     {
@@ -254,6 +275,9 @@ class CategorySearchService
 
     /**
      * 分面搜索（Faceted Search）
+     */
+    /**
+     * @return array<string, mixed>
      */
     public function facetedSearch(array $facets = []): array
     {

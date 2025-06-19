@@ -37,18 +37,22 @@ class CategoryService
 
     /**
      * 更新分类信息
+     * @param array<string, mixed> $data
      */
     public function updateCategory(Category $category, array $data): Category
     {
-        if ((bool) isset($data['title'])) {
+        if (isset($data['title']) && is_string($data['title'])) {
             $category->setTitle($data['title']);
         }
 
-        if ((bool) isset($data['parent'])) {
-            $category->setParent($data['parent']);
+        if (isset($data['parent'])) {
+            $parent = $data['parent'];
+            if ($parent instanceof Category || $parent === null) {
+                $category->setParent($parent);
+            }
         }
 
-        if ((bool) isset($data['sortNumber'])) {
+        if (isset($data['sortNumber']) && is_int($data['sortNumber'])) {
             $category->setSortNumber($data['sortNumber']);
         }
 
@@ -75,6 +79,7 @@ class CategoryService
 
     /**
      * 获取分类树形结构
+     * @return array<int, array<string, mixed>>
      */
     public function getCategoryTree(?Category $root = null): array
     {
@@ -88,6 +93,7 @@ class CategoryService
 
     /**
      * 构建单个分类的树形结构
+     * @return array<string, mixed>
      */
     private function buildCategoryTree(Category $category): array
     {
@@ -112,6 +118,7 @@ class CategoryService
 
     /**
      * 获取分类路径
+     * @return array<int, Category>
      */
     public function getCategoryPath(Category $category): array
     {
@@ -157,6 +164,7 @@ class CategoryService
 
     /**
      * 查找指定层级的分类
+     * @return array<int, Category>
      */
     public function findByLevel(int $level): array
     {
@@ -185,11 +193,13 @@ class CategoryService
         $qb->orderBy('c.sortNumber', 'DESC')
            ->addOrderBy('c.id', 'DESC');
 
+        /** @var array<int, Category> */
         return $qb->getQuery()->getResult();
     }
 
     /**
      * 查找根分类（顶级分类）
+     * @return array<int, Category>
      */
     public function findRootCategories(): array
     {
@@ -201,6 +211,7 @@ class CategoryService
 
     /**
      * 查找叶子分类（没有子分类的分类）
+     * @return array<int, Category>
      */
     public function findLeafCategories(): array
     {
@@ -210,6 +221,7 @@ class CategoryService
            ->orderBy('c.sortNumber', 'DESC')
            ->addOrderBy('c.id', 'DESC');
 
+        /** @var array<int, Category> */
         return $qb->getQuery()->getResult();
     }
 
@@ -217,6 +229,7 @@ class CategoryService
      * 获取标准化分类
      *
      * 根据AQ8011-2023标准返回预定义的分类结构
+     * @return array<string, array<int, string>>
      */
     public function getStandardizedCategories(): array
     {
@@ -253,6 +266,7 @@ class CategoryService
 
     /**
      * 按类型获取分类
+     * @return array<int, Category>
      */
     public function getCategoryByType(string $type): array
     {
@@ -267,6 +281,7 @@ class CategoryService
 
     /**
      * 验证分类结构
+     * @return array<int, string>
      */
     public function validateCategoryStructure(Category $category): array
     {
@@ -296,6 +311,7 @@ class CategoryService
 
     /**
      * 查找兄弟分类
+     * @return array<int, Category>
      */
     private function findSiblingCategories(Category $category): array
     {

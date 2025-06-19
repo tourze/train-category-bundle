@@ -19,6 +19,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\NumericFilter;
 use Tourze\TrainCategoryBundle\Entity\CategoryRequirement;
 
+/**
+ * @extends AbstractCrudController<CategoryRequirement>
+ */
 class CategoryRequirementCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
@@ -51,7 +54,10 @@ class CategoryRequirementCrudController extends AbstractCrudController
             ->autocomplete()
             ->setHelp('选择要配置要求的培训分类')
             ->formatValue(function ($value) {
-                return $value ? (string) $value : '未选择';
+                if ($value instanceof CategoryRequirement) {
+                    return (string) $value->getCategory();
+                }
+                return '未选择';
             });
 
         // 学时配置
@@ -133,14 +139,20 @@ class CategoryRequirementCrudController extends AbstractCrudController
             yield TextField::new('totalHours', '总学时')
                 ->setHelp('理论学时 + 实操学时')
                 ->formatValue(function ($value, $entity) {
-                    return $entity->getTotalHours() . ' 学时';
+                    if ($entity instanceof CategoryRequirement) {
+                        return $entity->getTotalHours() . ' 学时';
+                    }
+                    return '';
                 })
                 ->hideOnForm();
 
             yield TextField::new('requirementSummary', '要求摘要')
                 ->setHelp('培训要求的简要说明')
                 ->formatValue(function ($value, $entity) {
-                    return $entity->getRequirementSummary();
+                    if ($entity instanceof CategoryRequirement) {
+                        return $entity->getRequirementSummary();
+                    }
+                    return '';
                 })
                 ->hideOnForm();
         }

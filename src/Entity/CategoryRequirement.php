@@ -23,8 +23,8 @@ class CategoryRequirement implements Stringable
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-#[ORM\Column(type: Types::BIGINT, options: ['comment' => '字段说明'])]
-    private string $id;
+    #[ORM\Column(type: Types::BIGINT, options: ['comment' => '字段说明'])]
+    private ?string $id = null;
 
     #[ORM\OneToOne(targetEntity: Category::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]

@@ -53,7 +53,8 @@ class CategoryStatisticsService
         $qb = $this->categoryRepository->createQueryBuilder('c');
         $qb->select('AVG(SIZE(c.children)) as avg_children');
         $result = $qb->getQuery()->getSingleScalarResult();
-        $stats['avg_children_per_category'] = round($result, 2);
+        $avgChildrenResult = is_numeric($result) ? (float) $result : 0.0;
+        $stats['avg_children_per_category'] = round($avgChildrenResult, 2);
 
         // 最大深度
         $stats['max_depth'] = $this->calculateMaxDepth();
@@ -66,6 +67,7 @@ class CategoryStatisticsService
 
     /**
      * 获取分类层级分布统计
+     * @return array<string, mixed>
      */
     public function getLevelDistribution(): array
     {
@@ -83,6 +85,7 @@ class CategoryStatisticsService
 
     /**
      * 获取培训要求统计
+     * @return array<string, mixed>
      */
     public function getRequirementStatistics(): array
     {
@@ -101,6 +104,7 @@ class CategoryStatisticsService
 
     /**
      * 获取热门分类排行
+     * @return array<int, array<string, mixed>>
      */
     public function getPopularCategoriesRanking(int $limit = 20): array
     {
@@ -117,11 +121,13 @@ class CategoryStatisticsService
         ->orderBy('popularity_score', 'DESC')
         ->setMaxResults($limit);
 
+        /** @var array<int, array<string, mixed>> */
         return $qb->getQuery()->getResult();
     }
 
     /**
      * 获取分类使用情况分析
+     * @return array<string, mixed>
      */
     public function getCategoryUsageAnalysis(): array
     {

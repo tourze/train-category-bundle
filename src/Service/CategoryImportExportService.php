@@ -28,7 +28,8 @@ class CategoryImportExportService
      */
     public function exportCategories(array $options = []): array
     {
-        $format = (string) ($options['format'] ?? 'json');
+        $formatValue = $options['format'] ?? 'json';
+        $format = is_string($formatValue) ? $formatValue : 'json';
         $includeRequirements = (bool) ($options['includeRequirements'] ?? true);
         $includeHierarchy = (bool) ($options['includeHierarchy'] ?? true);
         $categoryIds = $options['categoryIds'] ?? null;
@@ -53,8 +54,10 @@ class CategoryImportExportService
         ];
 
         if ($includeHierarchy) {
+            /** @var array<int, Category> $categories */
             $exportData['categories'] = $this->buildHierarchicalExport($categories, $includeRequirements);
         } else {
+            /** @var array<int, Category> $categories */
             $exportData['categories'] = $this->buildFlatExport($categories, $includeRequirements);
         }
 
@@ -100,8 +103,10 @@ class CategoryImportExportService
             $this->entityManager->beginTransaction();
 
             // 处理导入数据
-            if (isset($data['categories'])) {
-                $importResult = $this->processImportData($data['categories'], $dryRun, $overwrite);
+            if (isset($data['categories']) && is_array($data['categories'])) {
+                /** @var array<int, array<string, mixed>> $categoriesData */
+                $categoriesData = $data['categories'];
+                $importResult = $this->processImportData($categoriesData, $dryRun, $overwrite);
                 $result = array_merge($result, $importResult);
             }
 
@@ -290,7 +295,8 @@ class CategoryImportExportService
     public function exportCategoryBranch(Category $rootCategory, array $options = []): array
     {
         $includeRequirements = (bool) ($options['includeRequirements'] ?? true);
-        $format = (string) ($options['format'] ?? 'json');
+        $formatValue = $options['format'] ?? 'json';
+        $format = is_string($formatValue) ? $formatValue : 'json';
 
         // 获取分类树
         $categoryTree = $this->buildCategoryBranch($rootCategory, $includeRequirements);

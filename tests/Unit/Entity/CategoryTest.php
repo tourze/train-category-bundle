@@ -185,7 +185,6 @@ class CategoryTest extends TestCase
         
         $apiArray = $this->category->retrieveApiArray();
         
-        $this->assertIsArray($apiArray);
         $this->assertArrayHasKey('id', $apiArray);
         $this->assertArrayHasKey('title', $apiArray);
         $this->assertEquals('API测试分类', $apiArray['title']);
@@ -198,7 +197,6 @@ class CategoryTest extends TestCase
         
         $adminArray = $this->category->retrieveAdminArray();
         
-        $this->assertIsArray($adminArray);
         $this->assertArrayHasKey('id', $adminArray);
         $this->assertArrayHasKey('title', $adminArray);
         $this->assertEquals('管理测试分类', $adminArray['title']);

@@ -22,74 +22,83 @@ class CategoryRequirementService
 
     /**
      * 为分类设置培训要求
+     * @param array<string, mixed> $requirements
      */
     public function setCategoryRequirement(Category $category, array $requirements): CategoryRequirement
     {
         $requirement = $this->requirementRepository->findByCategory($category);
         
-        if (!$requirement) {
+        if ($requirement === null) {
             $requirement = new CategoryRequirement();
             $requirement->setCategory($category);
         }
 
         // 设置学时要求
-        if ((bool) isset($requirements['initialTrainingHours'])) {
+        if (isset($requirements['initialTrainingHours']) && is_int($requirements['initialTrainingHours'])) {
             $requirement->setInitialTrainingHours($requirements['initialTrainingHours']);
         }
 
-        if ((bool) isset($requirements['refreshTrainingHours'])) {
+        if (isset($requirements['refreshTrainingHours']) && is_int($requirements['refreshTrainingHours'])) {
             $requirement->setRefreshTrainingHours($requirements['refreshTrainingHours']);
         }
 
-        if ((bool) isset($requirements['theoryHours'])) {
+        if (isset($requirements['theoryHours']) && is_int($requirements['theoryHours'])) {
             $requirement->setTheoryHours($requirements['theoryHours']);
         }
 
-        if ((bool) isset($requirements['practiceHours'])) {
+        if (isset($requirements['practiceHours']) && is_int($requirements['practiceHours'])) {
             $requirement->setPracticeHours($requirements['practiceHours']);
         }
 
         // 设置证书要求
-        if ((bool) isset($requirements['certificateValidityPeriod'])) {
+        if (isset($requirements['certificateValidityPeriod']) && is_int($requirements['certificateValidityPeriod'])) {
             $requirement->setCertificateValidityPeriod($requirements['certificateValidityPeriod']);
         }
 
         // 设置考试和培训要求
-        if ((bool) isset($requirements['requiresPracticalExam'])) {
+        if (isset($requirements['requiresPracticalExam']) && is_bool($requirements['requiresPracticalExam'])) {
             $requirement->setRequiresPracticalExam($requirements['requiresPracticalExam']);
         }
 
-        if ((bool) isset($requirements['requiresOnSiteTraining'])) {
+        if (isset($requirements['requiresOnSiteTraining']) && is_bool($requirements['requiresOnSiteTraining'])) {
             $requirement->setRequiresOnSiteTraining($requirements['requiresOnSiteTraining']);
         }
 
         // 设置年龄要求
-        if ((bool) isset($requirements['minimumAge'])) {
+        if (isset($requirements['minimumAge']) && is_int($requirements['minimumAge'])) {
             $requirement->setMinimumAge($requirements['minimumAge']);
         }
 
-        if ((bool) isset($requirements['maximumAge'])) {
+        if (isset($requirements['maximumAge']) && is_int($requirements['maximumAge'])) {
             $requirement->setMaximumAge($requirements['maximumAge']);
         }
 
         // 设置其他要求
-        if ((bool) isset($requirements['prerequisites'])) {
-            $requirement->setPrerequisites($requirements['prerequisites']);
+        if (isset($requirements['prerequisites']) && is_array($requirements['prerequisites'])) {
+            /** @var array<int, string> $prerequisites */
+            $prerequisites = $requirements['prerequisites'];
+            $requirement->setPrerequisites($prerequisites);
         }
 
-        if ((bool) isset($requirements['educationRequirements'])) {
-            $requirement->setEducationRequirements($requirements['educationRequirements']);
+        if (isset($requirements['educationRequirements']) && is_array($requirements['educationRequirements'])) {
+            /** @var array<int, string> $educationRequirements */
+            $educationRequirements = $requirements['educationRequirements'];
+            $requirement->setEducationRequirements($educationRequirements);
         }
 
-        if ((bool) isset($requirements['healthRequirements'])) {
-            $requirement->setHealthRequirements($requirements['healthRequirements']);
+        if (isset($requirements['healthRequirements']) && is_array($requirements['healthRequirements'])) {
+            /** @var array<int, string> $healthRequirements */
+            $healthRequirements = $requirements['healthRequirements'];
+            $requirement->setHealthRequirements($healthRequirements);
         }
 
-        if ((bool) isset($requirements['experienceRequirements'])) {
-            $requirement->setExperienceRequirements($requirements['experienceRequirements']);
+        if (isset($requirements['experienceRequirements']) && is_array($requirements['experienceRequirements'])) {
+            /** @var array<int, string> $experienceRequirements */
+            $experienceRequirements = $requirements['experienceRequirements'];
+            $requirement->setExperienceRequirements($experienceRequirements);
         }
 
-        if ((bool) isset($requirements['remarks'])) {
+        if (isset($requirements['remarks']) && is_string($requirements['remarks'])) {
             $requirement->setRemarks($requirements['remarks']);
         }
 

@@ -16,6 +16,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use Tourze\TrainCategoryBundle\Entity\Category;
 
+/**
+ * @extends AbstractCrudController<Category>
+ */
 class TrainCategoryCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
@@ -53,7 +56,10 @@ class TrainCategoryCrudController extends AbstractCrudController
             ->autocomplete()
             ->setHelp('选择上级分类，留空表示顶级分类')
             ->formatValue(function ($value) {
-                return $value ? (string) $value : '顶级分类';
+                if ($value instanceof Category) {
+                    return (string) $value;
+                }
+                return '顶级分类';
             });
 
         yield IntegerField::new('sortNumber', '排序值')

@@ -83,7 +83,13 @@ class CategoryRequirementRepository extends ServiceEntityRepository
 
         $result = $qb->getQuery()->getScalarResult();
         
-        return array_column($result, 'certificateValidityPeriod');
+        /** @var array<int, array<string, mixed>> */
+        $periods = [];
+        foreach ($result as $row) {
+            $periods[] = ['certificateValidityPeriod' => $row['certificateValidityPeriod']];
+        }
+        
+        return $periods;
     }
 
     /**

@@ -26,6 +26,9 @@ class CategoryIntegrationService
      * 与train-course-bundle集成
      * @return array<string, mixed>
      */
+    /**
+     * @return array<string, mixed>
+     */
     public function getCategoryCourses(Category $category): array
     {
         // 这里可以调用课程模块的服务
@@ -47,6 +50,9 @@ class CategoryIntegrationService
      * 与train-teacher-bundle集成
      * @return array<string, mixed>
      */
+    /**
+     * @return array<string, mixed>
+     */
     public function getCategoryTeachers(Category $category): array
     {
         // 这里可以调用教师模块的服务
@@ -66,6 +72,9 @@ class CategoryIntegrationService
      * 
      * 与train-record-bundle集成
      * @param array<string, mixed> $options
+     * @return array<string, mixed>
+     */
+    /**
      * @return array<string, mixed>
      */
     public function getCategoryTrainingRecords(Category $category, array $options = []): array
@@ -94,6 +103,9 @@ class CategoryIntegrationService
      * 获取分类的考试统计
      * @return array<string, mixed>
      */
+    /**
+     * @return array<string, mixed>
+     */
     public function getCategoryExamStatistics(Category $category): array
     {
         // 如需集成考试功能，请通过其他方式实现
@@ -116,6 +128,9 @@ class CategoryIntegrationService
      * 获取分类的证书颁发统计
      * 
      * 与certificate-bundle集成
+     * @return array<string, mixed>
+     */
+    /**
      * @return array<string, mixed>
      */
     public function getCategoryCertificateStatistics(Category $category): array
@@ -142,6 +157,9 @@ class CategoryIntegrationService
      * 
      * 综合验证用户资格
      * @param array<string, mixed> $userInfo
+     * @return array<string, mixed>
+     */
+    /**
      * @return array<string, mixed>
      */
     public function validateUserEligibility(Category $category, array $userInfo): array
@@ -191,6 +209,9 @@ class CategoryIntegrationService
      * 生成从基础到高级的培训路径
      * @return array<string, mixed>
      */
+    /**
+     * @return array<string, mixed>
+     */
     public function getCategoryTrainingPath(Category $category): array
     {
         $path = [
@@ -227,6 +248,9 @@ class CategoryIntegrationService
      * 获取分类的培训资源汇总
      * @return array<string, mixed>
      */
+    /**
+     * @return array<string, mixed>
+     */
     public function getCategoryResourceSummary(Category $category): array
     {
         return [
@@ -247,6 +271,9 @@ class CategoryIntegrationService
 
     /**
      * 同步分类数据到其他模块
+     * @return array<string, mixed>
+     */
+    /**
      * @return array<string, mixed>
      */
     public function syncCategoryToModules(Category $category): array
@@ -293,6 +320,9 @@ class CategoryIntegrationService
 
     /**
      * 获取分类的数据完整性报告
+     * @return array<string, mixed>
+     */
+    /**
      * @return array<string, mixed>
      */
     public function getCategoryIntegrityReport(Category $category): array

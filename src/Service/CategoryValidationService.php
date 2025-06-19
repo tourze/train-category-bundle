@@ -43,11 +43,12 @@ class CategoryValidationService
 
         // 验证分类路径长度
         $path = $this->categoryService->getCategoryPath($category);
-        $pathString = implode('/', array_map(fn($cat) => $cat->getTitle(), $path));
+        $pathString = implode('/', array_map(fn($cat) => $cat instanceof Category ? $cat->getTitle() : '', $path));
         if (strlen($pathString) > 200) {
             $errors[] = '分类路径过长，建议控制在200字符以内';
         }
 
+        /** @var array<int, string> */
         return $errors;
     }
 
@@ -66,14 +67,14 @@ class CategoryValidationService
         }
 
         // 验证年龄要求
-        if (isset($teacherInfo['age'])) {
+        if (isset($teacherInfo['age']) && is_int($teacherInfo['age'])) {
             if (!$requirement->checkAgeRequirement($teacherInfo['age'])) {
                 $errors[] = "教师年龄不符合要求（要求：{$requirement->getMinimumAge()}-{$requirement->getMaximumAge()}岁）";
             }
         }
 
         // 验证学历要求
-        if (isset($teacherInfo['education'])) {
+        if (isset($teacherInfo['education']) && is_string($teacherInfo['education'])) {
             $educationRequirements = $requirement->getEducationRequirements();
             if (!empty($educationRequirements)) {
                 $isEducationValid = $this->validateEducationRequirement(
@@ -87,11 +88,13 @@ class CategoryValidationService
         }
 
         // 验证工作经验
-        if (isset($teacherInfo['experience'])) {
+        if (isset($teacherInfo['experience']) && is_array($teacherInfo['experience'])) {
             $experienceRequirements = $requirement->getExperienceRequirements();
             if (!empty($experienceRequirements)) {
+                /** @var array<string, mixed> $experience */
+                $experience = $teacherInfo['experience'];
                 $isExperienceValid = $this->validateExperienceRequirement(
-                    $teacherInfo['experience'],
+                    $experience,
                     $experienceRequirements
                 );
                 if (!$isExperienceValid) {
@@ -101,11 +104,13 @@ class CategoryValidationService
         }
 
         // 验证健康状况
-        if (isset($teacherInfo['health'])) {
+        if (isset($teacherInfo['health']) && is_array($teacherInfo['health'])) {
             $healthRequirements = $requirement->getHealthRequirements();
             if (!empty($healthRequirements)) {
+                /** @var array<string, mixed> $health */
+                $health = $teacherInfo['health'];
                 $isHealthValid = $this->validateHealthRequirement(
-                    $teacherInfo['health'],
+                    $health,
                     $healthRequirements
                 );
                 if (!$isHealthValid) {
@@ -132,9 +137,10 @@ class CategoryValidationService
         }
 
         // 验证学时配置
-        if (isset($trainingData['hours'])) {
+        if (isset($trainingData['hours']) && is_int($trainingData['hours'])) {
             $hours = $trainingData['hours'];
-            $type = $trainingData['type'] ?? 'initial';
+            $typeValue = $trainingData['type'] ?? 'initial';
+            $type = is_string($typeValue) ? $typeValue : 'initial';
 
             if (!$this->requirementService->validateTrainingHours($category, $hours, $type)) {
                 $requiredHours = match ($type) {
@@ -145,7 +151,7 @@ class CategoryValidationService
                     'total' => $requirement->getTotalHours(),
                     default => 0,
                 };
-                $errors[] = "培训学时不足，要求至少{$requiredHours}学时，实际{$hours}学时";
+                $errors[] = sprintf('培训学时不足，要求至少%d学时，实际%d学时', $requiredHours, $hours);
             }
         }
 
@@ -189,15 +195,19 @@ class CategoryValidationService
         $eligibilityCheck = $this->requirementService->checkUserEligibility($category, $userInfo);
         if (!$eligibilityCheck['eligible']) {
             $result['eligible'] = false;
-            $result['reasons'] = array_merge($result['reasons'], $eligibilityCheck['reasons']);
+            $reasons = $eligibilityCheck['reasons'];
+            if (is_array($reasons)) {
+                $result['reasons'] = array_merge($result['reasons'], $reasons);
+            }
         }
 
         // 检查培训完成情况
-        if (isset($userInfo['trainingHours'])) {
+        if (isset($userInfo['trainingHours']) && is_numeric($userInfo['trainingHours'])) {
             $requiredHours = $requirement->getInitialTrainingHours();
-            if ($userInfo['trainingHours'] < $requiredHours) {
+            $completedHours = (int) $userInfo['trainingHours'];
+            if ($completedHours < $requiredHours) {
                 $result['eligible'] = false;
-                $result['reasons'][] = "培训学时不足，需要{$requiredHours}学时，已完成{$userInfo['trainingHours']}学时";
+                $result['reasons'][] = sprintf('培训学时不足，需要%d学时，已完成%d学时', $requiredHours, $completedHours);
             }
         }
 
@@ -232,6 +242,7 @@ class CategoryValidationService
         $warnings = [];
 
         // 检查分类命名是否符合标准
+        /** @var array<string, mixed> $standardCategories */
         $standardCategories = $this->categoryService->getStandardizedCategories();
         $isStandardCategory = $this->isStandardCategory($category, $standardCategories);
 
@@ -287,14 +298,25 @@ class CategoryValidationService
                 continue;
             }
 
-            $results[$category->getId()] = [
-                'category' => $category->getTitle(),
-                'structure' => $this->validateCategoryStructure($category),
-                'standard' => $this->validateStandardCompliance($category),
-            ];
+            $categoryId = $category->getId();
+            if ($categoryId !== null) {
+                $results[$categoryId] = [
+                    'category' => $category->getTitle(),
+                    'structure' => $this->validateCategoryStructure($category),
+                    'standard' => $this->validateStandardCompliance($category),
+                ];
+            }
         }
 
-        return $results;
+        /** @var array<int, array<string, mixed>> */
+        $numericKeyResults = [];
+        $index = 0;
+        foreach ($results as $result) {
+            $numericKeyResults[$index] = $result;
+            $index++;
+        }
+
+        return $numericKeyResults;
     }
 
     /**
@@ -346,7 +368,7 @@ class CategoryValidationService
     /**
      * 验证工作经验要求
      * @param array<string, mixed> $userExperience
-     * @param array<string, mixed> $requirements
+     * @param array<int, string> $requirements
      */
     private function validateExperienceRequirement(array $userExperience, array $requirements): bool
     {
@@ -358,7 +380,7 @@ class CategoryValidationService
     /**
      * 验证健康要求
      * @param array<string, mixed> $userHealth
-     * @param array<string, mixed> $requirements
+     * @param array<int, string> $requirements
      */
     private function validateHealthRequirement(array $userHealth, array $requirements): bool
     {
