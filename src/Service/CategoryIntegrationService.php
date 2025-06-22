@@ -22,7 +22,7 @@ class CategoryIntegrationService
 
     /**
      * 获取分类的培训课程信息
-     * 
+     *
      * 与train-course-bundle集成
      * @return array<string, mixed>
      */
@@ -46,7 +46,7 @@ class CategoryIntegrationService
 
     /**
      * 获取分类的教师信息
-     * 
+     *
      * 与train-teacher-bundle集成
      * @return array<string, mixed>
      */
@@ -69,7 +69,7 @@ class CategoryIntegrationService
 
     /**
      * 获取分类的培训记录统计
-     * 
+     *
      * 与train-record-bundle集成
      * @param array<string, mixed> $options
      * @return array<string, mixed>
@@ -126,7 +126,7 @@ class CategoryIntegrationService
 
     /**
      * 获取分类的证书颁发统计
-     * 
+     *
      * 与certificate-bundle集成
      * @return array<string, mixed>
      */
@@ -154,7 +154,7 @@ class CategoryIntegrationService
 
     /**
      * 验证用户是否符合分类的培训资格
-     * 
+     *
      * 综合验证用户资格
      * @param array<string, mixed> $userInfo
      * @return array<string, mixed>
@@ -205,7 +205,7 @@ class CategoryIntegrationService
 
     /**
      * 获取分类的完整培训路径
-     * 
+     *
      * 生成从基础到高级的培训路径
      * @return array<string, mixed>
      */
