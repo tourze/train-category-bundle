@@ -5,11 +5,12 @@ namespace Tourze\TrainCategoryBundle\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Tourze\TrainCategoryBundle\Entity\Category;
 use Tourze\TrainCategoryBundle\Entity\CategoryRequirement;
+use Tourze\TrainCategoryBundle\Exception\CategoryRequirementValidationException;
 use Tourze\TrainCategoryBundle\Repository\CategoryRequirementRepository;
 
 /**
  * 分类培训要求服务类
- * 
+ *
  * 管理培训分类的具体要求，包括学时配置、考试要求、年龄限制等
  */
 class CategoryRequirementService
@@ -105,7 +106,7 @@ class CategoryRequirementService
         // 验证要求的合理性
         $errors = $requirement->validateHours();
         if (!empty($errors)) {
-            throw new \InvalidArgumentException('培训要求配置不合理：' . implode('；', $errors));
+            throw new CategoryRequirementValidationException('培训要求配置不合理：' . implode('；', $errors));
         }
 
         $this->entityManager->persist($requirement);

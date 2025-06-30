@@ -4,6 +4,8 @@ namespace Tourze\TrainCategoryBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Tourze\TrainCategoryBundle\Entity\Category;
+use Tourze\TrainCategoryBundle\Exception\CategoryDeletionException;
+use Tourze\TrainCategoryBundle\Exception\CategoryMoveException;
 use Tourze\TrainCategoryBundle\Repository\CategoryRepository;
 
 /**
@@ -70,7 +72,7 @@ class CategoryService
     {
         // 检查是否有子分类
         if ($category->getChildren()->count() > 0) {
-            throw new \InvalidArgumentException('无法删除包含子分类的分类');
+            throw new CategoryDeletionException('无法删除包含子分类的分类');
         }
 
         $this->entityManager->remove($category);
@@ -85,7 +87,7 @@ class CategoryService
     {
         if ($root === null) {
             $rootCategories = $this->findRootCategories();
-            return array_map([$this, 'buildCategoryTree'], $rootCategories);
+            return array_map(fn(Category $category) => $this->buildCategoryTree($category), $rootCategories);
         }
 
         return [$this->buildCategoryTree($root)];
@@ -140,7 +142,7 @@ class CategoryService
     {
         // 检查是否会形成循环引用
         if ($newParent !== null && $this->wouldCreateCircularReference($category, $newParent)) {
-            throw new \InvalidArgumentException('无法移动分类：会形成循环引用');
+            throw new CategoryMoveException('无法移动分类：会形成循环引用');
         }
 
         $category->setParent($newParent);

@@ -2,14 +2,13 @@
 
 namespace Tourze\TrainCategoryBundle\Service;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Tourze\TrainCategoryBundle\Entity\Category;
 use Tourze\TrainCategoryBundle\Repository\CategoryRepository;
 use Tourze\TrainCategoryBundle\Repository\CategoryRequirementRepository;
 
 /**
  * 分类统计分析服务类
- * 
+ *
  * 提供分类数据的统计分析、报表生成等功能
  */
 class CategoryStatisticsService

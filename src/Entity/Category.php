@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\Arrayable\ApiArrayInterface;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use Tourze\TrainCategoryBundle\Repository\CategoryRepository;
@@ -25,11 +25,7 @@ class Category implements \Stringable, ApiArrayInterface, AdminArrayInterface
 {
     use TimestampableAware;
     use BlameableAware;
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
+    use SnowflakeKeyAware;
 
     #[Ignore]
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'children')]
@@ -39,11 +35,11 @@ class Category implements \Stringable, ApiArrayInterface, AdminArrayInterface
     /**
      * @var Collection<int, Category>
      */
-    #[Groups(['api_tree'])]
+    #[Groups(groups: ['api_tree'])]
     #[ORM\OneToMany(targetEntity: Category::class, mappedBy: 'parent')]
     private Collection $children;
 
-    #[Groups(['api_tree'])]
+    #[Groups(groups: ['api_tree'])]
     #[ORM\Column(length: 100, options: ['comment' => '分类名称'])]
     private string $title;
 
@@ -73,10 +69,6 @@ class Category implements \Stringable, ApiArrayInterface, AdminArrayInterface
         return "{$parent}/{$this->getTitle()}";
     }
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getParent(): ?Category
     {

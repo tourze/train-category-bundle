@@ -9,11 +9,11 @@ use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
 use Tourze\TrainCategoryBundle\Repository\CategoryRepository;
 
-#[MethodDoc('获取分类信息')]
-#[MethodExpose('GetJobTrainingCategory')]
+#[MethodDoc(summary: '获取分类信息')]
+#[MethodExpose(method: 'GetJobTrainingCategory')]
 class GetJobTrainingCategory extends BaseProcedure
 {
-    #[MethodParam('上级分类ID')]
+    #[MethodParam(description: '上级分类ID')]
     public ?string $parentId = null;
 
     public function __construct(

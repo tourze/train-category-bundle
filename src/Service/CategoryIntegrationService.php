@@ -7,7 +7,7 @@ use Tourze\TrainCategoryBundle\Repository\CategoryRepository;
 
 /**
  * 分类集成服务类
- * 
+ *
  * 提供与其他培训相关模块的集成功能
  */
 class CategoryIntegrationService

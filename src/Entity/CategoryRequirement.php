@@ -5,13 +5,13 @@ namespace Tourze\TrainCategoryBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\TrainCategoryBundle\Repository\CategoryRequirementRepository;
 
 /**
  * 分类培训要求实体
- * 
+ *
  * 定义每个培训分类的具体要求，包括学时、考试要求、前置条件等
  */
 #[ORM\Entity(repositoryClass: CategoryRequirementRepository::class)]
@@ -20,11 +20,7 @@ use Tourze\TrainCategoryBundle\Repository\CategoryRequirementRepository;
 class CategoryRequirement implements Stringable
 {
     use TimestampableAware;
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, options: ['comment' => '字段说明'])]
-    private ?string $id = null;
+    use SnowflakeKeyAware;
 
     #[ORM\OneToOne(targetEntity: Category::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -84,10 +80,6 @@ class CategoryRequirement implements Stringable
     #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '备注说明'])]
     private ?string $remarks = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getCategory(): Category
     {

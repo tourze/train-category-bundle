@@ -2,7 +2,6 @@
 
 namespace Tourze\TrainCategoryBundle\Service;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Tourze\TrainCategoryBundle\Entity\Category;
 use Tourze\TrainCategoryBundle\Repository\CategoryRepository;
@@ -10,7 +9,7 @@ use Tourze\TrainCategoryBundle\Repository\CategoryRequirementRepository;
 
 /**
  * 分类搜索服务类
- * 
+ *
  * 提供高级搜索、筛选、排序等功能
  */
 class CategorySearchService

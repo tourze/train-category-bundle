@@ -10,7 +10,7 @@ use Tourze\TrainCategoryBundle\Entity\Category;
 
 /**
  * 详细分类数据填充（基于真实数据）
- * 
+ *
  * 基于job_training_category.sql中的真实数据创建三级分类，包括：
  * - 电工作业的具体分类（低压电工、高压电工、防爆电气等）
  * - 危险化学品安全作业的具体工艺分类
